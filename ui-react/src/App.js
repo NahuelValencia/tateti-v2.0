@@ -1,26 +1,35 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import axios from 'axios';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class NetworkCall extends React.Component {
+  constructor() {
+      super()
+      this.state = {
+        apiResponse:""
+      }
+  }
+
+  async componentDidMount() {
+      try {
+          const response = await axios.get('http://localhost:9000/users')
+          this.setState({ apiResponse: response.data })
+      } catch (e) {
+          console.log(e)
+      }
+  }
+
+  render(){
+    return (
+      <div className="App">
+        <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+        </header>
+
+        <p>{this.state.apiResponse}</p>
+
+      </div>
+    );
+  }
 }
-
-export default App;
