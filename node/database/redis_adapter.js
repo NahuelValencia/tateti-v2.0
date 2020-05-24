@@ -27,40 +27,25 @@ function searchById(key) {
     });
 }
 
-function getLastKnownID(isClient = false, isContract = false) {
-    console.log(`client: ${isClient}, contract: ${isContract}`)
-    if (isClient) {
-        return new Promise(resolve => {
-            clientRedis.get('clientID', (err, result) => {
-                console.log(`getLastKnownID ${result}`)
-                if (result) {
-                    resolve(parseInt(result));
-                } else {
-                    resolve(0);
-                }
-            });
+function getLastKnownID() {
+    //console.log(`player: ${isPlayer}, game: ${isGame}`)
+    return new Promise(resolve => {
+        clientRedis.get('playerID', (err, result) => {
+            console.log(`getLastKnownID ${result}`)
+            if (result) {
+                resolve(parseInt(result));
+            } else {
+                resolve(0);
+            }
         });
-    }
-
-    if (isContract) {
-        return new Promise(resolve => {
-            clientRedis.get('contractID', (err, result) => {
-                console.log(`getLastKnownID ${result}`)
-                if (result) {
-                    resolve(parseInt(result));
-                } else {
-                    resolve(0);
-                }
-            });
-        });
-    }
+    });
 }
 
-function saveID(id, isClient = false, isContract = false) {
-    console.log(`client: ${isClient}, contract: ${isContract}`)
-    if (isClient) {
+function saveID(id, isPlayer = false, isGame = false) {
+    console.log(`player: ${isPlayer}, game: ${isGame}`)
+    if (isPlayer) {
         return new Promise(resolve => {
-            clientRedis.set('clientID', id, (err, result) => {
+            clientRedis.set('playerID', id, (err, result) => {
                 if (result) {
                     console.log(result);
                     resolve(null);
@@ -72,9 +57,9 @@ function saveID(id, isClient = false, isContract = false) {
         });
     }
 
-    if (isContract) {
+    if (isGame) {
         return new Promise(resolve => {
-            clientRedis.set('contractID', id, (err, result) => {
+            clientRedis.set('gameID', id, (err, result) => {
                 if (result) {
                     console.log(result);
                     resolve(null);
@@ -115,9 +100,9 @@ function resourceExists(key) {
     });
 }
 
-function update(key, data, isClient = false, isContract = false) {
-    console.log(`client: ${isClient}, contract: ${isContract}`)
-    if (isClient) {
+function update(key, data, isPlayer = false, isGame = false) {
+    console.log(`client: ${isPlayer}, game: ${isGame}`)
+    if (isPlayer) {
         return new Promise(resolve => {
             clientRedis.hmset(key, data, (error, result) => {
                 if (result) {
@@ -131,7 +116,7 @@ function update(key, data, isClient = false, isContract = false) {
         });
     }
 
-    if (isContract) {
+    if (isGame) {
         return new Promise(resolve => {
             clientRedis.hmset(key, data, (error, result) => {
                 if (result) {
