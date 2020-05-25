@@ -27,18 +27,33 @@ function searchById(key) {
     });
 }
 
-function getLastKnownID() {
-    //console.log(`player: ${isPlayer}, game: ${isGame}`)
-    return new Promise(resolve => {
-        clientRedis.get('playerID', (err, result) => {
-            console.log(`getLastKnownID ${result}`)
-            if (result) {
-                resolve(parseInt(result));
-            } else {
-                resolve(0);
-            }
+function getLastKnownID(isPlayer = false, isGame = false) {
+    console.log(`player: ${isPlayer}, game: ${isGame}`)
+    if (isPlayer) {
+        return new Promise(resolve => {
+            clientRedis.get('playerID', (err, result) => {
+                console.log(`getLastKnownID ${result}`)
+                if (result) {
+                    resolve(parseInt(result));
+                } else {
+                    resolve(0);
+                }
+            });
         });
-    });
+    }
+
+    if (isGame) {
+        return new Promise(resolve => {
+            clientRedis.get('gameID', (err, result) => {
+                console.log(`getLastKnownID ${result}`)
+                if (result) {
+                    resolve(parseInt(result));
+                } else {
+                    resolve(0);
+                }
+            });
+        });
+    }
 }
 
 function saveID(id, isPlayer = false, isGame = false) {

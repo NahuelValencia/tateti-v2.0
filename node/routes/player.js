@@ -3,6 +3,7 @@ var playerRouter = express.Router();
 var HttpStatus = require('http-status-codes');
 
 var message = require('../utils/responseConstants');
+var piece = require('../utils/pieceUtils');
 var token = require('../utils/tokenGenerator');
 const Cryptr = require('cryptr');
 
@@ -91,7 +92,7 @@ playerRouter.post('/', async function(req, res, next) {
     //    console.log(decryptedString)
 
     try {
-        var id = await RedisClient.getLastKnownID();
+        var id = await RedisClient.getLastKnownID(isPlayer = true, isGame = false);
         var newPlayerId = id + 1;
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
@@ -102,6 +103,8 @@ playerRouter.post('/', async function(req, res, next) {
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
+
+    //TODO: check piece selected (X or O)
 
     var data = req.body;
     data.playerId = newPlayerId;
