@@ -115,7 +115,7 @@ gameRouter.post('/', async function(req, res, next) {
 
     //set game id
     try {
-        var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = true);
+        var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = true, isBoard = false, isRoom = false);
         console.log(`Game previous id: ${id}`)
         var newGameId = id + 1;
     } catch (err) {
@@ -123,7 +123,7 @@ gameRouter.post('/', async function(req, res, next) {
     }
 
     try {
-        await RedisClient.saveID(newGameId, isPlayer = false, isGame = true);
+        await RedisClient.saveID(newGameId, isPlayer = false, isGame = true, isBoard = false, isRoom = false);
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
@@ -148,7 +148,7 @@ gameRouter.post('/', async function(req, res, next) {
 
     //set board id
     try {
-        var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = false, isBoard = true);
+        var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = false, isBoard = true, isRoom = false);
         console.log(`Board previous id: ${id}`)
         var newBoardId = id + 1;
     } catch (err) {
@@ -156,7 +156,7 @@ gameRouter.post('/', async function(req, res, next) {
     }
 
     try {
-        await RedisClient.saveID(newBoardId, isPlayer = false, isGame = false, isBoard = true);
+        await RedisClient.saveID(newBoardId, isPlayer = false, isGame = false, isBoard = true, isRoom = false);
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }

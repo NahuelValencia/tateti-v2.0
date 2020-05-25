@@ -7,73 +7,9 @@ var piece = require('../utils/pieceUtils');
 var token = require('../utils/tokenGenerator');
 const Cryptr = require('cryptr');
 
-var parse = require('body-parser')
+var parse = require('body-parser');
 
-var RedisClient = require('../database/redis_adapter')
-
-//GETS
-/*playerRouter.get('/', async function(req, res, next) {
-
-    var patternkey = `player#*`;
-    var clients = new Array();
-
-    try {
-        var allClients = await RedisClient.getAll(patternkey);
-    } catch (err) {
-        return console.log(`An error has occurred: ${err}`)
-    }
-
-    if (allClients.length > 0) {
-        console.log(`All clients: ${allClients}`)
-
-        for (idClient of allClients) {
-            console.log(idClient)
-
-            try {
-                var client = await RedisClient.searchById(idClient)
-            } catch (err) {
-                return console.log(`An error has occurred: ${err}`)
-            }
-
-            clients.push(client)
-
-        }
-
-        res.json({
-            status: HttpStatus.OK,
-            response: clients
-        });
-
-    } else {
-        res.json({
-            status: HttpStatus.NOT_FOUND,
-            response: errorResponse
-        });
-    }
-});
-playerRouter.get('/:playerId', async function(req, res, next) {
-    var key = `player#${req.params.playerId}`
-
-    try {
-        var response = await RedisClient.searchById(key)
-        console.log(response)
-    } catch (err) {
-        return console.log(`An error has occurred: ${err}`)
-    }
-
-    if (response) {
-        res.json({
-            status: HttpStatus.OK,
-            response: response
-        });
-    } else {
-        return res.json({
-            status: HttpStatus.NOT_FOUND,
-            response: errorResponse
-        });
-    }
-
-});*/
+var RedisClient = require('../database/redis_adapter');
 
 //POSTS
 playerRouter.post('/', async function(req, res, next) {
@@ -91,43 +27,151 @@ playerRouter.post('/', async function(req, res, next) {
     //    const decryptedString = encrypt.decrypt(private_token); para verificar si el user es valido
     //    console.log(decryptedString)
 
+
+    //CREATE PLAYER
     try {
-        var id = await RedisClient.getLastKnownID(isPlayer = true, isGame = false, isBoard = false);
+        var id = await RedisClient.getLastKnownID(isPlayer = true, isGame = false, isBoard = false, isRoom = false);
         var newPlayerId = id + 1;
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
 
     try {
-        await RedisClient.saveID(newPlayerId, isPlayer = true);
+        await RedisClient.saveID(newPlayerId, isPlayer = true, isGame = false, isBoard = false, isRoom = false);
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
 
-    var data = req.body;
-    data.turn = false;
+    var player_data = req.body;
+    player_data.turn = false;
 
     //Set turn accorddind to the piece selected (X or O). Xs starts.
-    if (data.pieceSelected == 'X') {
-        data.turn = true;
+    if (player_data.pieceSelected == 'X') {
+        player_data.turn = true;
     }
 
     //TODO: Verificar que el otro jugador que se quiere unir al juego no haya seleccionado la misma ficha.
 
-    data.playerId = newPlayerId;
-    data.session_token = private_token
-    var key = `player#${newPlayerId}`;
+    player_data.playerId = newPlayerId;
+    player_data.session_token = private_token
+
+    var player_key = `player#${newPlayerId}`;
+
+
+    /*
+    CREATE WAITING ROOM
+    check waiting room. If there is a room with just one player we can play.
+    If there is room available, create it!
+    */
+
+    var roomData = {};
 
     try {
-        var response = await RedisClient.save(key, data)
+        var allRooms = await RedisClient.getAll("waitingRoom#*");
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
 
-    if (response) {
+    if (allRooms.length > 0) {
+        let availableRooms = new Array();
+
+        for (roomId of allRooms) {
+            console.log(roomId)
+
+            try {
+                var room = await RedisClient.searchById(roomId)
+            } catch (err) {
+                return console.log(`An error has occurred: ${err}`)
+            }
+
+            //verificar si estan disponibles
+            if (room.available == "true") {
+                availableRooms.push(room);
+            }
+        }
+
+        if (availableRooms.length > 0) {
+            roomData = availableRooms[0]
+            roomData.player2 = parseInt(newPlayerId);
+            roomData.available = false;
+
+            try {
+                await RedisClient.update(`waitingRoom#${roomData.roomId}`, roomData, isPlayer = false, isGame = false, isBoard = false, isRoom = true);
+            } catch (err) {
+                return console.log(`An error has occurred: ${err}`)
+            }
+        } else {
+
+            try {
+                var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = false, isBoard = false, isRoom = true);
+                var newRoomId = id + 1;
+            } catch (err) {
+                return console.log(`An error has occurred: ${err}`)
+            }
+
+            try {
+                await RedisClient.saveID(newRoomId, isPlayer = false, isGame = false, isBoard = false, isRoom = true);
+            } catch (err) {
+                return console.log(`An error has occurred: ${err}`)
+            }
+
+            var room_key = `waitingRoom#${newRoomId}`
+
+            roomData.roomId = parseInt(newRoomId);
+            roomData.player1 = parseInt(newPlayerId);
+            roomData.player2 = "";
+            roomData.available = true
+
+            try {
+                await RedisClient.save(room_key, roomData)
+            } catch (err) {
+                return console.log(`An error has occurred: ${err}`)
+            }
+        }
+
+    } else {
+
+        try {
+            var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = false, isBoard = false, isRoom = true);
+            var newRoomId = id + 1;
+        } catch (err) {
+            return console.log(`An error has occurred: ${err}`)
+        }
+
+        try {
+            await RedisClient.saveID(newRoomId, isPlayer = false, isGame = false, isBoard = false, isRoom = true);
+        } catch (err) {
+            return console.log(`An error has occurred: ${err}`)
+        }
+
+        var room_key = `waitingRoom#${newRoomId}`
+
+        roomData.roomId = parseInt(newRoomId);
+        roomData.player1 = parseInt(newPlayerId);
+        roomData.player2 = "";
+        roomData.available = true
+
+        try {
+            await RedisClient.save(room_key, roomData)
+        } catch (err) {
+            return console.log(`An error has occurred: ${err}`)
+        }
+    }
+
+    //Save player after set it a room
+    player_data.roomId = parseInt(roomData.roomId);
+
+    try {
+        var player_response = await RedisClient.save(player_key, player_data)
+    } catch (err) {
+        return console.log(`An error has occurred: ${err}`)
+    }
+
+    //Json with player
+    if (player_response) {
         res.json({
             status: HttpStatus.OK,
-            response: data
+            response: player_data
         });
     } else {
         res.json({
@@ -136,89 +180,5 @@ playerRouter.post('/', async function(req, res, next) {
         });
     }
 });
-
-//DELETES
-/*playerRouter.delete('/', async function(req, res, next) {
-    var response = await RedisClient.deleteAll()
-
-    if (response) {
-        res.json({
-            status: HttpStatus.OK,
-            response: 'All clients and contracts have been deleted'
-        });
-    } else {
-        res.json({
-            status: HttpStatus.NOT_FOUND,
-            response: errorResponse
-        });
-    }
-
-});
-playerRouter.delete('/:playerId', async function(req, res, next) {
-    var key = `player#${req.params.playerId}`
-
-    var response = await RedisClient.deleteByID(key)
-
-    if (response) {
-        res.json({
-            status: HttpStatus.OK,
-            response: `Client ${req.params.playerId} deleted`
-        });
-    } else {
-        res.json({
-            status: HttpStatus.NOT_FOUND,
-            response: errorResponse
-        });
-    }
-});
-
-/* DELETE ALL CONTRACTS ?????
-playerRouter.delete('/contracts', function(req, res, next) {
-    res.send('DELETE all contracts');
-});
-*/
-
-//PUTS
-/*playerRouter.put('/:playerId', async function(req, res, next) {
-    var data = req.body
-    data.playerId = req.params.playerId
-
-    var key = `player#${data.playerId}`
-
-    //check if the client existe
-    try {
-        var exists = await RedisClient.resourceExists(key)
-    } catch (err) {
-        return console.log(`An error has occurred aqui: ${err}`)
-    }
-
-    if (exists == 1) {
-        try {
-            var response = await RedisClient.update(key, data, isClient = true, isContract = false)
-
-            if (response) {
-                res.json({
-                    status: HttpStatus.OK,
-                    response: data
-                });
-            } else {
-                res.json({
-                    status: HttpStatus.BAD_REQUEST,
-                    response: "Can't update client" + err
-                });
-            }
-
-        } catch (err) {
-            return console.log(`An error has occurred o aqui: ${err}`)
-        }
-
-    } else {
-        res.json({
-            status: HttpStatus.NOT_FOUND,
-            response: errorResponse
-        });
-    }
-});
-*/
 
 module.exports = playerRouter;
