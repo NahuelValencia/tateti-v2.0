@@ -135,29 +135,63 @@ gameRouter.post('/', async function(req, res, next) {
         return console.log(`An error has occurred: ${err}`)
     }
 
-    //create the board
-    var board = [
-        null, null, null,
-        null, null, null,
-        null, null, null,
-    ]
-
-
     //save the game
-    var data = {};
+    var data = {}
     data.gameId = newGameId;
-    data.status = null;
-    data.players = players
-    data.board = board
-    data.winner = null
+    data.status = "null";
+    data.winner = "null"
 
-    var key = `game#${newGameId}`;
+    //en redis no se puede guardar mas que string. por lo que el tratamos estructuras complejas por separado y la estructura que vamos a mandar al JSON le ponermo todo
+
+    var game_key = `game#${newGameId}`;
 
     try {
-        var response = await RedisClient.save(key, data)
+        await RedisClient.save(game_key, data)
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
+
+
+    //set board id
+    try {
+        var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = false, isBoard = true);
+        console.log(`Board previous id: ${id}`)
+        var newBoardId = id + 1;
+    } catch (err) {
+        return console.log(`An error has occurred: ${err}`)
+    }
+
+    try {
+        await RedisClient.saveID(newBoardId, isPlayer = false, isGame = false, isBoard = true);
+    } catch (err) {
+        return console.log(`An error has occurred: ${err}`)
+    }
+
+    //create the board
+    var board = {
+        "c0": "null",
+        "c1": "null",
+        "c2": "null",
+        "c3": "null",
+        "c4": "null",
+        "c5": "null",
+        "c6": "null",
+        "c7": "null",
+        "c8": "null",
+    }
+
+    var board_key = `board#${newBoardId}`;
+
+    try {
+        var response = await RedisClient.save(board_key, board)
+    } catch (err) {
+        return console.log(`An error has occurred: ${err}`)
+    }
+
+    //lo seteo aca para mostrarlo en el JSON. No se puede guardar en redis todo junto
+    data.players = players
+    data.boardId = newBoardId
+    data.board = board
 
     if (response) {
         res.json({

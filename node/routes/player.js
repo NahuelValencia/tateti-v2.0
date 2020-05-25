@@ -92,7 +92,7 @@ playerRouter.post('/', async function(req, res, next) {
     //    console.log(decryptedString)
 
     try {
-        var id = await RedisClient.getLastKnownID(isPlayer = true, isGame = false);
+        var id = await RedisClient.getLastKnownID(isPlayer = true, isGame = false, isBoard = false);
         var newPlayerId = id + 1;
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
