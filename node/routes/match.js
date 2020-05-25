@@ -3,6 +3,7 @@ var moveRouter = express.Router();
 var HttpStatus = require('http-status-codes');
 
 var message = require('../utils/responseConstants');
+var tateti = require('../utils/tatetiUtils');
 var token = require('../utils/tokenGenerator');
 const Cryptr = require('cryptr');
 
@@ -81,13 +82,6 @@ moveRouter.put('/', async function(req, res, next) {
     const header_token = req.header('Authorization'); //ProgAv2020
     console.log(header_token)
 
-    /*
-    deberia enviar el token que se le genero al usuario cdo se registro
-    Debe ir en el header cdo le da a play
-    Despues de verificar si se envia un header, se deberia desencriptar y el valor tiene que ser igual
-    a ProgAv2020
-    */
-
     const cryptr = new Cryptr(process.env.SECRET_KEY);
     //const private_token = encrypt.encrypt(authorization);
     try {
@@ -107,6 +101,29 @@ moveRouter.put('/', async function(req, res, next) {
         });
     }
 
+
+    //SEARCH GAME
+    var game_key = `game#${req.body.gameId}`;
+    console.log(`gameId: ${game_key}`);
+
+    try {
+        var game = await RedisClient.searchById(game_key);
+        console.log(game)
+    } catch (e) {
+        return console.log(`An error has occurred: ${e}`);
+    }
+
+    //check game status
+    if (game.status == "Game Over") {
+        return res.json({
+            status: HttpStatus.BAD_REQUEST,
+            response: message.gameEnded
+        });
+    }
+
+    game.moveQty = parseInt(game.moveQty) + 1;
+
+
     var player_key = `player#${req.body.playerId}`;
     console.log(`playerId: ${player_key}`);
     //search player
@@ -116,17 +133,6 @@ moveRouter.put('/', async function(req, res, next) {
     } catch (e) {
         return console.log(`An error has occurred: ${e}`);
     }
-
-    var game_key = `game#${req.body.gameId}`;
-    console.log(`gameId: ${game_key}`);
-    //search game
-    try {
-        var game = await RedisClient.searchById(game_key);
-        console.log(game)
-    } catch (e) {
-        return console.log(`An error has occurred: ${e}`);
-    }
-
 
     var board_key = `board#${req.body.boardId}`;
     console.log(`boardId: ${board_key}`);
@@ -138,8 +144,7 @@ moveRouter.put('/', async function(req, res, next) {
         return console.log(`An error has occurred: ${e}`);
     }
 
-
-    var position = `c${req.body.position}`;
+    var position = `${req.body.position}`;
     console.log(position)
 
     //set piece to the board
@@ -164,9 +169,18 @@ moveRouter.put('/', async function(req, res, next) {
     console.log("game...")
     console.log(game)
 
+
+    currentPlayer = player;
+    //check if there is a winner
+    if (tateti.isTateti(game, board, currentPlayer)) {
+        console.log("isTateti")
+        game.winner = currentPlayer.playerId;
+        game.status = "Game Over"
+    }
+
     //update game
     try {
-        var response = await RedisClient.update(game_key, game, isPlayer = false, isGame = true, isBoard = false)
+        await RedisClient.update(game_key, game, isPlayer = false, isGame = true, isBoard = false)
     } catch (err) {
         return console.log(`An error has occurred o aqui: ${err}`)
     }
@@ -182,6 +196,7 @@ moveRouter.put('/', async function(req, res, next) {
     data.gameId = game.gameId;
     data.status = game.status;
     data.winner = game.winner;
+    data.moveQty = game.moveQty;
     data.players = "players";
     data.boardId = req.body.boardId;
     data.board = board;

@@ -104,9 +104,16 @@ playerRouter.post('/', async function(req, res, next) {
         return console.log(`An error has occurred: ${err}`)
     }
 
-    //TODO: check piece selected (X or O)
-
     var data = req.body;
+    data.turn = false;
+
+    //Set turn accorddind to the piece selected (X or O). Xs starts.
+    if (data.pieceSelected == 'X') {
+        data.turn = true;
+    }
+
+    //TODO: Verificar que el otro jugador que se quiere unir al juego no haya seleccionado la misma ficha.
+
     data.playerId = newPlayerId;
     data.session_token = private_token
     var key = `player#${newPlayerId}`;
