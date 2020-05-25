@@ -8,6 +8,7 @@ require('dotenv').config();
 
 var playerRouter = require('./routes/player');
 var tatetiRouter = require('./routes/tateti');
+var gameRouter = require('./routes/game');
 
 var app = express();
 
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Routes
 app.use('/player', playerRouter);
 app.use('/tateti', tatetiRouter);
+app.use('/game', gameRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
