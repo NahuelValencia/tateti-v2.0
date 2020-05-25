@@ -27,8 +27,8 @@ function searchById(key) {
     });
 }
 
-function getLastKnownID(isPlayer = false, isGame = false, isBoard = false) {
-    console.log(`player: ${isPlayer}, game: ${isGame}, board: ${isBoard}`);
+function getLastKnownID(isPlayer = false, isGame = false, isBoard = false, isRoom = false) {
+    console.log(`player: ${isPlayer}, game: ${isGame}, board: ${isBoard}, room: ${isRoom}`);
     if (isPlayer) {
         return new Promise(resolve => {
             clientRedis.get('playerID', (err, result) => {
@@ -67,10 +67,23 @@ function getLastKnownID(isPlayer = false, isGame = false, isBoard = false) {
             });
         });
     }
+
+    if (isRoom) {
+        return new Promise(resolve => {
+            clientRedis.get('roomID', (err, result) => {
+                console.log(`getLastKnownID ${result}`)
+                if (result) {
+                    resolve(parseInt(result));
+                } else {
+                    resolve(0);
+                }
+            });
+        });
+    }
 }
 
-function saveID(id, isPlayer = false, isGame = false, isBoard = false) {
-    console.log(`player: ${isPlayer}, game: ${isGame}, board: ${isBoard}`)
+function saveID(id, isPlayer = false, isGame = false, isBoard = false, isRoom = false) {
+    console.log(`player: ${isPlayer}, game: ${isGame}, board: ${isBoard}, room: ${isRoom}`)
     if (isPlayer) {
         return new Promise(resolve => {
             clientRedis.set('playerID', id, (err, result) => {
@@ -112,6 +125,20 @@ function saveID(id, isPlayer = false, isGame = false, isBoard = false) {
             });
         });
     }
+
+    if (isRoom) {
+        return new Promise(resolve => {
+            clientRedis.set('roomID', id, (err, result) => {
+                if (result) {
+                    console.log(result);
+                    resolve(null);
+                } else {
+                    console.log(err);
+                    resolve(err);
+                }
+            });
+        });
+    }
 }
 
 function save(key, data) {
@@ -142,8 +169,8 @@ function resourceExists(key) {
     });
 }
 
-function update(key, data, isPlayer = false, isGame = false, isBoard = false) {
-    console.log(`client: ${isPlayer}, game: ${isGame}, board: ${isBoard}`)
+function update(key, data, isPlayer = false, isGame = false, isBoard = false, isRoom = false) {
+    console.log(`client: ${isPlayer}, game: ${isGame}, board: ${isBoard}, room: ${isRoom}`);
     if (isPlayer) {
         return new Promise(resolve => {
             clientRedis.hmset(key, data, (error, result) => {
@@ -173,6 +200,20 @@ function update(key, data, isPlayer = false, isGame = false, isBoard = false) {
     }
 
     if (isBoard) {
+        return new Promise(resolve => {
+            clientRedis.hmset(key, data, (error, result) => {
+                if (result) {
+                    console.log(`Result: ${result}`)
+                    resolve(result)
+                } else {
+                    console.log(`Error: ${error}`)
+                    resolve(error)
+                }
+            });
+        });
+    }
+
+    if (isRoom) {
         return new Promise(resolve => {
             clientRedis.hmset(key, data, (error, result) => {
                 if (result) {
