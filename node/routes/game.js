@@ -81,15 +81,8 @@ gameRouter.post('/', async function(req, res, next) {
     const header_token = req.header('Authorization'); //ProgAv2020
     console.log(header_token)
 
-    /*
-    deberia enviar el token que se le genero al usuario cdo se registro
-    Debe ir en el header cdo le da a play
-    Despues de verificar si se envia un header, se deberia desencriptar y el valor tiene que ser igual
-    a ProgAv2020
-    */
-
     const cryptr = new Cryptr(process.env.SECRET_KEY);
-    //const private_token = encrypt.encrypt(authorization);
+
     try {
         var authorization = cryptr.decrypt(header_token);
         console.log(authorization)
@@ -107,8 +100,8 @@ gameRouter.post('/', async function(req, res, next) {
         });
     }
 
-    var players = new Array()
-        //search player in redis by Id
+    //search players in redis by Id
+    var players = new Array();
     try {
         for (player of req.body.players) {
             console.log(player.id)
@@ -138,8 +131,9 @@ gameRouter.post('/', async function(req, res, next) {
     //save the game
     var data = {}
     data.gameId = newGameId;
-    data.status = "null";
-    data.winner = "null"
+    data.status = "Started";
+    data.winner = "null";
+    data.moveQty = 0;
 
     //en redis no se puede guardar mas que string. por lo que el tratamos estructuras complejas por separado y la estructura que vamos a mandar al JSON le ponermo todo
 
@@ -169,15 +163,15 @@ gameRouter.post('/', async function(req, res, next) {
 
     //create the board
     var board = {
-        "c0": "null",
-        "c1": "null",
-        "c2": "null",
-        "c3": "null",
-        "c4": "null",
-        "c5": "null",
-        "c6": "null",
-        "c7": "null",
-        "c8": "null",
+        "0": "null",
+        "1": "null",
+        "2": "null",
+        "3": "null",
+        "4": "null",
+        "5": "null",
+        "6": "null",
+        "7": "null",
+        "8": "null",
     }
 
     var board_key = `board#${newBoardId}`;

@@ -112,6 +112,8 @@ playerRouter.post('/', async function(req, res, next) {
         data.turn = true;
     }
 
+    //TODO: Verificar que el otro jugador que se quiere unir al juego no haya seleccionado la misma ficha.
+
     data.playerId = newPlayerId;
     data.session_token = private_token
     var key = `player#${newPlayerId}`;
