@@ -10,69 +10,6 @@ var parse = require('body-parser')
 
 var RedisClient = require('../database/redis_adapter')
 
-//GETS
-/*gameRouter.get('/', async function(req, res, next) {
-
-    var patternkey = `player#*`;
-    var clients = new Array();
-
-    try {
-        var allClients = await RedisClient.getAll(patternkey);
-    } catch (err) {
-        return console.log(`An error has occurred: ${err}`)
-    }
-
-    if (allClients.length > 0) {
-        console.log(`All clients: ${allClients}`)
-
-        for (idClient of allClients) {
-            console.log(idClient)
-
-            try {
-                var client = await RedisClient.searchById(idClient)
-            } catch (err) {
-                return console.log(`An error has occurred: ${err}`)
-            }
-
-            clients.push(client)
-
-        }
-
-        res.json({
-            status: HttpStatus.OK,
-            response: clients
-        });
-
-    } else {
-        res.json({
-            status: HttpStatus.NOT_FOUND,
-            response: errorResponse
-        });
-    }
-});
-gameRouter.get('/:playerId', async function(req, res, next) {
-    var key = `player#${req.params.playerId}`
-
-    try {
-        var response = await RedisClient.searchById(key)
-        console.log(response)
-    } catch (err) {
-        return console.log(`An error has occurred: ${err}`)
-    }
-
-    if (response) {
-        res.json({
-            status: HttpStatus.OK,
-            response: response
-        });
-    } else {
-        return res.json({
-            status: HttpStatus.NOT_FOUND,
-            response: errorResponse
-        });
-    }
-
-});*/
 
 //POSTS
 gameRouter.post('/', async function(req, res, next) {
@@ -100,7 +37,7 @@ gameRouter.post('/', async function(req, res, next) {
         });
     }
 
-    //search players in redis by Id
+    //SEARCH PLAYERS SENT IN BODY, IN REDIS BY ID
     var players = new Array();
     try {
         for (player of req.body.players) {
@@ -113,7 +50,7 @@ gameRouter.post('/', async function(req, res, next) {
         return console.log(`An error has occurred: ${error}`)
     }
 
-    //set game id
+    //CREATE A GAME
     try {
         var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = true, isBoard = false, isRoom = false);
         console.log(`Game previous id: ${id}`)
@@ -128,25 +65,31 @@ gameRouter.post('/', async function(req, res, next) {
         return console.log(`An error has occurred: ${err}`)
     }
 
-    //save the game
-    var data = {}
-    data.gameId = newGameId;
-    data.status = "Started";
-    data.winner = "null";
-    data.moveQty = 0;
+    //SAVE THE GAME IN REDIS. Also relate the player with the game
+    var game_data = {}
+    game_data.gameId = newGameId;
+    game_data.status = "Started";
+    game_data.winner = "null";
+    game_data.moveQty = 0;
+    game_data.player1 = players[0].playerId;
+    game_data.player2 = players[1].playerId;
 
-    //en redis no se puede guardar mas que string. por lo que el tratamos estructuras complejas por separado y la estructura que vamos a mandar al JSON le ponermo todo
+    /*
+    en redis no se puede guardar mas que string.
+    por lo que el tratamos estructuras complejas por separado y 
+    la estructura que vamos a mandar al JSON le ponemos todo
+    */
 
     var game_key = `game#${newGameId}`;
 
     try {
-        await RedisClient.save(game_key, data)
+        await RedisClient.save(game_key, game_data)
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
 
 
-    //set board id
+    //CREAT A BOARD
     try {
         var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = false, isBoard = true, isRoom = false);
         console.log(`Board previous id: ${id}`)
@@ -161,17 +104,17 @@ gameRouter.post('/', async function(req, res, next) {
         return console.log(`An error has occurred: ${err}`)
     }
 
-    //create the board
+    //SAVE THE BOARD
     var board = {
-        "0": "null",
-        "1": "null",
-        "2": "null",
-        "3": "null",
-        "4": "null",
-        "5": "null",
-        "6": "null",
-        "7": "null",
-        "8": "null",
+        0: "null",
+        1: "null",
+        2: "null",
+        3: "null",
+        4: "null",
+        5: "null",
+        6: "null",
+        7: "null",
+        8: "null",
     }
 
     var board_key = `board#${newBoardId}`;
@@ -182,10 +125,15 @@ gameRouter.post('/', async function(req, res, next) {
         return console.log(`An error has occurred: ${err}`)
     }
 
-    //lo seteo aca para mostrarlo en el JSON. No se puede guardar en redis todo junto
-    data.players = players
-    data.boardId = newBoardId
-    data.board = board
+    //Lo seteo aca para mostrarlo en el JSON. No se puede guardar en redis todo junto
+    var data = {};
+    data.gameId = game_data.gameId;
+    data.status = game_data.status;
+    data.winner = game_data.winner;
+    data.moveQty = game_data.moveQty;
+    data.players = players;
+    data.boardId = newBoardId;
+    data.board = board;
 
     if (response) {
         res.json({

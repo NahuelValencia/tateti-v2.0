@@ -124,9 +124,10 @@ moveRouter.put('/', async function(req, res, next) {
     game.moveQty = parseInt(game.moveQty) + 1;
 
 
+    //SEARCH THE PLAYER IN REDIS
     var player_key = `player#${req.body.playerId}`;
     console.log(`playerId: ${player_key}`);
-    //search player
+
     try {
         var player = await RedisClient.searchById(player_key);
         console.log(player);
@@ -134,6 +135,7 @@ moveRouter.put('/', async function(req, res, next) {
         return console.log(`An error has occurred: ${e}`);
     }
 
+    //SEARCH THE BOARD IN REDIS
     var board_key = `board#${req.body.boardId}`;
     console.log(`boardId: ${board_key}`);
     //search board
@@ -147,30 +149,29 @@ moveRouter.put('/', async function(req, res, next) {
     var position = `${req.body.position}`;
     console.log(position)
 
-    //set piece to the board
+    //set the player to the board
     var move = {};
     move.playerId = player.playerId;
     move.gameId = game.gameId;
     move.boardId = req.body.boardId;
     move.position = position;
 
-    console.log("move...")
+    console.log("move...") //check if move is necesary
     console.log(move)
 
-
+    currentPlayer = player;
     //change board value
-    board[position] = move.playerId
-    console.log("New board")
+    board[position] = currentPlayer.playerId
+    console.log("Board updated")
     console.log(board)
 
     //change game status
-    game.status = "In progress"
+    game.status = "In Progress"
 
     console.log("game...")
     console.log(game)
 
 
-    currentPlayer = player;
     //check if there is a winner
     if (tateti.isTateti(game, board, currentPlayer)) {
         console.log("isTateti")
@@ -178,14 +179,14 @@ moveRouter.put('/', async function(req, res, next) {
         game.status = "Game Over"
     }
 
-    //update game
+    //UPDATE THE GAME
     try {
         await RedisClient.update(game_key, game, isPlayer = false, isGame = true, isBoard = false)
     } catch (err) {
         return console.log(`An error has occurred o aqui: ${err}`)
     }
 
-    //update board
+    //UPDATE THE BOARD
     try {
         var response = await RedisClient.update(board_key, board, isPlayer = false, isGame = false, isBoard = true)
     } catch (err) {
