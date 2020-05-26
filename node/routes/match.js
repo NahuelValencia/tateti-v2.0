@@ -11,69 +11,6 @@ var parse = require('body-parser')
 
 var RedisClient = require('../database/redis_adapter')
 
-//GETS
-/*moveRouter.get('/', async function(req, res, next) {
-
-    var patternkey = `player#*`;
-    var clients = new Array();
-
-    try {
-        var allClients = await RedisClient.getAll(patternkey);
-    } catch (err) {
-        return console.log(`An error has occurred: ${err}`)
-    }
-
-    if (allClients.length > 0) {
-        console.log(`All clients: ${allClients}`)
-
-        for (idClient of allClients) {
-            console.log(idClient)
-
-            try {
-                var client = await RedisClient.searchById(idClient)
-            } catch (err) {
-                return console.log(`An error has occurred: ${err}`)
-            }
-
-            clients.push(client)
-
-        }
-
-        res.json({
-            status: HttpStatus.OK,
-            response: clients
-        });
-
-    } else {
-        res.json({
-            status: HttpStatus.NOT_FOUND,
-            response: errorResponse
-        });
-    }
-});
-moveRouter.get('/:playerId', async function(req, res, next) {
-    var key = `player#${req.params.playerId}`
-
-    try {
-        var response = await RedisClient.searchById(key)
-        console.log(response)
-    } catch (err) {
-        return console.log(`An error has occurred: ${err}`)
-    }
-
-    if (response) {
-        res.json({
-            status: HttpStatus.OK,
-            response: response
-        });
-    } else {
-        return res.json({
-            status: HttpStatus.NOT_FOUND,
-            response: errorResponse
-        });
-    }
-
-});*/
 
 //PUT
 moveRouter.put('/', async function(req, res, next) {
