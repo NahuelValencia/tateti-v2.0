@@ -23,22 +23,21 @@ function isTateti(game, board, currentPlayer) {
     if (game.moveQty < 5) {
         return false;
     }
-    console.log("mayor a 4 jugadas")
+
     var points = 0;
     for (var cell in board) {
         console.log(cell + ":" + board[cell]);
         if (board[cell] == currentPlayer.playerId) {
-            points = points + Math.pow(2, parseInt(cell))
+            points = points + Math.pow(2, parseInt(cell));
         }
     }
     console.log(`Current's player points: ${points}`);
     console.log(WINNER_VALUES.find(value => (value & points) == value));
 
     if (WINNER_VALUES.find(value => (value & points) == value) != undefined) {
-
         return true;
     }
-    return false
+    return false;
 }
 
 module.exports = { isTateti }

@@ -73,7 +73,7 @@ tatetiRouter.get('/:clientId', async function(req, res, next) {
 //POSTS
 tatetiRouter.post('/', async function(req, res, next) {
     try {
-        var id = await RedisClient.getLastKnownID(isClient = true, isContract = false, isBoard = false);
+        var id = await RedisClient.getLastKnownID(isClient = true, isContract = false, isBoard = false, isRoom = false);
         var newClientId = id + 1;
         console.log(`New client ID: ${newClientId}`)
     } catch (err) {
