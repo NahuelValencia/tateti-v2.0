@@ -75,6 +75,52 @@ roomRouter.get('/', async function(req, res, next) {
 
 })
 
+roomRouter.get('/:idRoom', async function(req, res, next) {
+    //validate token
+    const header_token = req.header('Authorization'); //ProgAv2020
+    console.log(header_token)
+
+    const cryptr = new Cryptr(process.env.SECRET_KEY);
+
+    try {
+        var authorization = cryptr.decrypt(header_token);
+        console.log(authorization)
+    } catch (e) {
+        return res.json({
+            status: HttpStatus.UNAUTHORIZED,
+            response: message.notAuthorized
+        });
+    }
+
+    if (authorization != process.env.SECRET_KEY) {
+        return res.json({
+            status: HttpStatus.UNAUTHORIZED,
+            response: message.notAuthorized
+        });
+    }
+
+    var room_key = `waitingRoom#${req.params.idRoom}`
+    try {
+        var room = await RedisClient.searchById(room_key)
+        console.log(`Room ready`)
+        console.log(room)
+    } catch (error) {
+        return console.log(`An error has occurred: ${error}`)
+    }
+
+    if (room) {
+        return res.json({
+            status: HttpStatus.OK,
+            response: room
+        });
+    } else {
+        return res.json({
+            status: HttpStatus.NOT_FOUND,
+            response: message.notFound
+        });
+    }
+})
+
 //POSTS
 roomRouter.post('/', async function(req, res, next) {
     //validate token
