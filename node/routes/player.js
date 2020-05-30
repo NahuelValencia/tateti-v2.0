@@ -39,15 +39,8 @@ playerRouter.post('/', async function(req, res, next) {
     }
 
     var player_data = req.body;
+
     player_data.turn = false;
-
-    //Set turn accordding to the piece selected (X or O). Xs starts.
-    if (player_data.pieceSelected == 'X') {
-        player_data.turn = true;
-    }
-
-    //TODO: Verificar que el otro jugador que se quiere unir al juego no haya seleccionado la misma ficha.
-
     player_data.playerId = newPlayerId;
     player_data.session_token = private_token;
 

@@ -60,11 +60,18 @@ roomRouter.get('/', async function(req, res, next) {
         }
 
         //return a list of available rooms and an empty list when there is no available rooms
-        return res.json({
-            status: HttpStatus.OK,
-            response: availableRooms
+        if (availableRooms.length > 0) {
+            return res.json({
+                status: HttpStatus.OK,
+                response: availableRooms
+            })
+        } else {
+            return res.json({
+                status: HttpStatus.NOT_FOUND,
+                response: message.notFound
+            })
+        }
 
-        })
     } else {
         return res.json({
             status: HttpStatus.NOT_FOUND,
@@ -147,6 +154,33 @@ roomRouter.post('/', async function(req, res, next) {
     }
 
     /*
+    Check if the player who wants to create the room exists
+    */
+    var player_key = `player#${req.body.playerId}`
+    try {
+        var player = await RedisClient.searchById(player_key)
+    } catch (error) {
+        return console.log(`An error has occurred: ${error}`)
+    }
+
+    if (player) {
+        //Set an X to the player who create the room    
+        player.pieceSelected = 'X';
+
+        //update player
+        try {
+            await RedisClient.update(player_key, player, isPlayer = true, isGame = false, isBoard = false, isRoom = false)
+        } catch (error) {
+            return console.log(`An error has occurred: ${error}`)
+        }
+    } else {
+        return res.json({
+            status: HttpStatus.NOT_FOUND,
+            response: message.notFound
+        });
+    }
+
+    /*
     CREATE WAITING ROOM
     */
 
@@ -218,6 +252,27 @@ roomRouter.post('/:idRoom/join', async function(req, res, next) {
     }
 
     /*
+    Check if the player who wants to join the room exists
+    */
+    var player_key = `player#${req.body.playerId}`
+    try {
+        var player = await RedisClient.searchById(player_key)
+    } catch (error) {
+        return console.log(`An error has occurred: ${error}`)
+    }
+
+    if (player) {
+        //update player with an O piece
+        player.pieceSelected = 'O';
+        await RedisClient.update(player_key, player, isPlayer = true, isGame = false, isBoard = false, isRoom = false)
+    } else {
+        return res.json({
+            status: HttpStatus.NOT_FOUND,
+            response: message.notFound
+        });
+    }
+
+    /*
     JOIN TO A WAITING ROOM
     */
     var room_key = `waitingRoom#${req.params.idRoom}`
@@ -228,6 +283,16 @@ roomRouter.post('/:idRoom/join', async function(req, res, next) {
         console.log(room)
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
+    }
+
+    /*
+    Check if the room exists
+    */
+    if (!room) {
+        return res.json({
+            status: HttpStatus.NOT_FOUND,
+            response: message.notFound
+        });
     }
 
     //check if the room is available
