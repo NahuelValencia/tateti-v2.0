@@ -74,6 +74,25 @@ gameRouter.post('/', async function(req, res, next) {
     game_data.player1 = players[0].playerId;
     game_data.player2 = players[1].playerId;
 
+
+    //CREAT A BOARD
+    try {
+        var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = false, isBoard = true, isRoom = false);
+        console.log(`Board previous id: ${id}`)
+        var newBoardId = id + 1;
+    } catch (err) {
+        return console.log(`An error has occurred: ${err}`)
+    }
+    //set the boardId to the game
+    game_data.boardId = newBoardId;
+
+    try {
+        await RedisClient.saveID(newBoardId, isPlayer = false, isGame = false, isBoard = true, isRoom = false);
+    } catch (err) {
+        return console.log(`An error has occurred: ${err}`)
+    }
+
+
     /*
     en redis no se puede guardar mas que string.
     por lo que el tratamos estructuras complejas por separado y 
@@ -84,22 +103,6 @@ gameRouter.post('/', async function(req, res, next) {
 
     try {
         await RedisClient.save(game_key, game_data)
-    } catch (err) {
-        return console.log(`An error has occurred: ${err}`)
-    }
-
-
-    //CREAT A BOARD
-    try {
-        var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = false, isBoard = true, isRoom = false);
-        console.log(`Board previous id: ${id}`)
-        var newBoardId = id + 1;
-    } catch (err) {
-        return console.log(`An error has occurred: ${err}`)
-    }
-
-    try {
-        await RedisClient.saveID(newBoardId, isPlayer = false, isGame = false, isBoard = true, isRoom = false);
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
@@ -132,10 +135,87 @@ gameRouter.post('/', async function(req, res, next) {
     data.winner = game_data.winner;
     data.moveQty = game_data.moveQty;
     data.players = players;
-    data.boardId = newBoardId;
+    data.boardId = game_data.boardId;
     data.board = board;
 
     if (response) {
+        res.json({
+            status: HttpStatus.OK,
+            response: data
+        });
+    } else {
+        res.json({
+            status: HttpStatus.BAD_REQUEST,
+            response: message.cantCreate + error
+        });
+    }
+});
+
+
+//GET
+gameRouter.get('/:gameId', async function(req, res, next) {
+
+    const header_token = req.header('Authorization'); //ProgAv2020
+    console.log(header_token)
+
+    const cryptr = new Cryptr(process.env.SECRET_KEY);
+
+    try {
+        var authorization = cryptr.decrypt(header_token);
+        console.log(authorization)
+    } catch (e) {
+        return res.json({
+            status: HttpStatus.UNAUTHORIZED,
+            response: message.notAuthorized
+        });
+    }
+
+    if (authorization != process.env.SECRET_KEY) {
+        return res.json({
+            status: HttpStatus.UNAUTHORIZED,
+            response: message.notAuthorized
+        });
+    }
+
+    //SEARCH GAME
+    var game_key = `game#${req.params.gameId}`
+    try {
+        var game = await RedisClient.searchById(game_key)
+    } catch (error) {
+        return console.log(`An error has occurred: ${error}`)
+    }
+
+    if (game) {
+        console.log(game)
+        try {
+            var player1 = await RedisClient.searchById(`player#${game.player1}`)
+            var player2 = await RedisClient.searchById(`player#${game.player2}`)
+            var board = await RedisClient.searchById(`board#${game.boardId}`)
+        } catch (error) {
+            return console.log(`An error has occurred: ${error}`)
+        }
+    } else {
+        return res.json({
+            status: HttpStatus.NOT_FOUND,
+            response: message.notFound
+        });
+    }
+
+    //Lo seteo aca para mostrarlo en el JSON. No se puede guardar en redis todo junto
+    var data = {};
+    data.gameId = game.gameId;
+    data.status = game.status;
+    data.winner = game.winner;
+    data.moveQty = game.moveQty;
+    data.players = new Array();
+    data.players[0] = player1;
+    data.players[1] = player2;
+    data.boardId = game.boardId;
+    data.board = board;
+
+    console.log(data)
+
+    if (board && player1 && player2) {
         res.json({
             status: HttpStatus.OK,
             response: data

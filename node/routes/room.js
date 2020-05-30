@@ -164,7 +164,8 @@ roomRouter.post('/', async function(req, res, next) {
     }
 
     if (player) {
-        //Set an X to the player who create the room    
+        //Set an X to the player who create the room and change the turn
+        player.turn = true;
         player.pieceSelected = 'X';
 
         //update player
