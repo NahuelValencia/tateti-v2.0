@@ -4,6 +4,7 @@ const internatError = 'Internal server error';
 const notAuthorized = 'Not authorized to do this action';
 const cantCreate = "Can't create the resource";
 const cantUpdate = "Can't update the resource";
+const notYourTurn = "Not your turn";
 const busyRoom = "Busy room";
 const gameEnded = "Game Over";
 
@@ -14,6 +15,7 @@ module.exports = {
     notAuthorized,
     cantCreate,
     cantUpdate,
+    notYourTurn,
     busyRoom,
     gameEnded,
 };

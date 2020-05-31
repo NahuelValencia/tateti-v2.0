@@ -4,10 +4,8 @@ var HttpStatus = require('http-status-codes');
 
 var message = require('../utils/responseConstants');
 var tateti = require('../utils/tatetiUtils');
-var token = require('../utils/tokenGenerator');
-const Cryptr = require('cryptr');
 
-var parse = require('body-parser')
+const Cryptr = require('cryptr');
 
 var RedisClient = require('../database/redis_adapter')
 
@@ -50,17 +48,6 @@ moveRouter.put('/', async function(req, res, next) {
         return console.log(`An error has occurred: ${e}`);
     }
 
-    //check game status
-    if (game.status == "Game Over") {
-        return res.json({
-            status: HttpStatus.BAD_REQUEST,
-            response: message.gameEnded
-        });
-    }
-
-    game.moveQty = parseInt(game.moveQty) + 1;
-
-
     //SEARCH THE PLAYER IN REDIS
     var player_key = `player#${req.body.playerId}`;
     console.log(`playerId: ${player_key}`);
@@ -70,6 +57,14 @@ moveRouter.put('/', async function(req, res, next) {
         console.log(player);
     } catch (e) {
         return console.log(`An error has occurred: ${e}`);
+    }
+
+    //validate turn
+    if (player.turn == "false") {
+        return res.json({
+            status: HttpStatus.BAD_REQUEST,
+            response: message.badRequest + ". " + message.notYourTurn
+        });
     }
 
     //SEARCH THE BOARD IN REDIS
@@ -82,6 +77,24 @@ moveRouter.put('/', async function(req, res, next) {
     } catch (e) {
         return console.log(`An error has occurred: ${e}`);
     }
+
+    //check if the resources exist
+    if (!player || !game || !board) {
+        return res.json({
+            status: HttpStatus.NOT_FOUND,
+            response: message.notFound
+        });
+    }
+
+    //check game status
+    if (game.status == "Game Over") {
+        return res.json({
+            status: HttpStatus.BAD_REQUEST,
+            response: message.gameEnded
+        });
+    }
+
+    game.moveQty = parseInt(game.moveQty) + 1;
 
     var position = `${req.body.position}`;
     console.log(position)
@@ -116,16 +129,40 @@ moveRouter.put('/', async function(req, res, next) {
         game.status = "Game Over"
     }
 
+    //UPDATE TURN'S PLAYER
+    try {
+        var player1 = await RedisClient.searchById(`player#${game.player1}`)
+        var player2 = await RedisClient.searchById(`player#${game.player2}`)
+        console.log("-----------")
+        console.log(player1)
+        console.log(player2)
+        console.log(player1.turn)
+        console.log(player2.turn)
+        player1.turn = player1.turn == "true" ? false : true
+        player2.turn = player2.turn == "true" ? false : true
+        console.log(player1.turn)
+        console.log(player2.turn)
+    } catch (error) {
+        return console.log(`An error has occurred o aqui: ${error}`)
+    }
+
+    try {
+        await RedisClient.update(`player#${game.player1}`, player1, isPlayer = true, isGame = false, isBoard = false, isRoom = false)
+        await RedisClient.update(`player#${game.player2}`, player2, isPlayer = true, isGame = false, isBoard = false, isRoom = false)
+    } catch (err) {
+        return console.log(`An error has occurred o aqui: ${err}`)
+    }
+
     //UPDATE THE GAME
     try {
-        await RedisClient.update(game_key, game, isPlayer = false, isGame = true, isBoard = false)
+        await RedisClient.update(game_key, game, isPlayer = false, isGame = true, isBoard = false, isRoom = false)
     } catch (err) {
         return console.log(`An error has occurred o aqui: ${err}`)
     }
 
     //UPDATE THE BOARD
     try {
-        var response = await RedisClient.update(board_key, board, isPlayer = false, isGame = false, isBoard = true)
+        var response = await RedisClient.update(board_key, board, isPlayer = false, isGame = false, isBoard = true, isRoom = false)
     } catch (err) {
         return console.log(`An error has occurred o aqui: ${err}`)
     }
@@ -135,8 +172,17 @@ moveRouter.put('/', async function(req, res, next) {
     data.status = game.status;
     data.winner = game.winner;
     data.moveQty = game.moveQty;
-    data.players = "players";
-    data.boardId = req.body.boardId;
+
+    if (player.playerId == player1.playerId) {
+        player.turn = player1.turn
+    }
+
+    if (player.playerId == player2.playerId) {
+        player.turn = player2.turn
+    }
+
+    data.player = player;
+    data.boardId = game.boardId;
     data.board = board;
 
     if (response) {
