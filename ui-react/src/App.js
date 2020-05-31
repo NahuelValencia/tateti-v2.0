@@ -8,6 +8,7 @@ class App extends React.Component {
     return (
       <div className="">
         <Title />
+        <br />
         <FormPlayer />
 
       </div>

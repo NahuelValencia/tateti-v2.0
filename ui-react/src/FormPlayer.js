@@ -1,11 +1,14 @@
 import React from "react";
 import axios from 'axios';
+import Welcome from './Welcome.js';
 
 class FormPlayer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: ''
+      name: '',
+      playerData: {},
+      sumbited: false
     };
   }
 
@@ -15,7 +18,7 @@ class FormPlayer extends React.Component {
     this.setState(newState);
   }
 
-  handleSubmit = async event => {
+  handleSubmit = event => {
     event.preventDefault();
     console.log('Player: ' + this.state.name);
 
@@ -27,18 +30,28 @@ class FormPlayer extends React.Component {
       name: this.state.name
     }
 
+    this.setState({
+      sumbited: true
+    })
+
     axios
       .post(`http://localhost:9000/player`, player, {
         headers: headers
       })
       .then(res => {
-        console.log(player);
-        console.log(res);
-        console.log(res.data);
+        if (res.status === 200) {
+          console.log("Status OK")
+          console.log(res.data.response.name)
+          this.setState({
+            name: res.data.response.name,
+            playerData: res.data,
+          })
+        }
       })
       .catch((error) => {
         console.log(error)
       })
+    console.log('Name: ' + this.state.name)
   }
 
   render() {
@@ -47,11 +60,13 @@ class FormPlayer extends React.Component {
         <form onSubmit={this.handleSubmit}>
           <label>
             Player Name:
-          <input id="name" type="text" value={this.state.name} onChange={this.handleChange} />
+            <input id="name" type="text" value={this.state.name} onChange={this.handleChange} />
           </label>
 
           <button type="submit" value="Submit">OK</button>
         </form>
+        <br />
+        <Welcome state={this.state} />
       </div>
     )
   }
