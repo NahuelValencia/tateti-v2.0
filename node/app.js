@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var cors = require('cors');
+var cors = require('cors'); //allow us to connect FE with BE
 require('dotenv').config();
 
 var playerRouter = require('./routes/player');

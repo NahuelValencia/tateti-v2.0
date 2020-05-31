@@ -66,4 +66,37 @@ playerRouter.post('/', async function(req, res, next) {
     }
 });
 
+//GET just to check if the player has been created
+//POSTS
+playerRouter.get('/', async function(req, res, next) {
+    try {
+        var allPlayers = await RedisClient.getAll(`player#*`)
+    } catch (err) {
+        return console.log(`An error has occurred: ${err}`)
+    }
+
+    var players = new Array()
+    for (const playerId of allPlayers) {
+        try {
+            var player = await RedisClient.searchById(playerId)
+        } catch (error) {
+            return console.log(`An error has occurred: ${error}`)
+        }
+        players.push(player)
+    }
+    //Json with players
+    if (players.length > 0) {
+        res.json({
+            status: HttpStatus.OK,
+            response: players
+        });
+    } else {
+        res.json({
+            status: HttpStatus.NOT_FOUND,
+            response: message.notFound + error
+        });
+    }
+});
+
+
 module.exports = playerRouter;
