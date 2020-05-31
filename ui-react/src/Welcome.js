@@ -1,5 +1,5 @@
 import React from 'react';
-
+import ButtonGet from './ButtonGet';
 
 function Welcome(props) {
     console.log(`welcome`)
@@ -11,7 +11,8 @@ function Welcome(props) {
     return (
         <div>
             <p>Welcome {props.state.name}</p>
-
+            <br />
+            <ButtonGet />
         </div>
     );
 }
