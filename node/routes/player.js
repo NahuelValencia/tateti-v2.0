@@ -23,6 +23,12 @@ playerRouter.post('/', async function(req, res, next) {
     //    const decryptedString = encrypt.decrypt(private_token); para verificar si el user es valido
     //    console.log(decryptedString)
 
+    if (req.body.name == "" || req.body.name == null) {
+        return res.json({
+            status: HttpStatus.BAD_REQUEST,
+            response: message.noName
+        });
+    }
 
     //CREATE PLAYER
     try {
