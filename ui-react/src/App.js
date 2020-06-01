@@ -1,35 +1,20 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import axios from 'axios';
+import FormPlayer from './FormPlayer';
+import Title from './Title';
 
-export default class NetworkCall extends React.Component {
-  constructor() {
-      super()
-      this.state = {
-        apiResponse:""
-      }
-  }
-
-  async componentDidMount() {
-      try {
-          const response = await axios.get('http://localhost:9000/users')
-          this.setState({ apiResponse: response.data })
-      } catch (e) {
-          console.log(e)
-      }
-  }
-
-  render(){
+class App extends React.Component {
+  render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-        </header>
-
-        <p>{this.state.apiResponse}</p>
+      <div className="">
+        <Title />
+        <br />
+        <FormPlayer />
 
       </div>
     );
   }
 }
+
+export default App;
+
