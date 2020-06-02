@@ -1,14 +1,12 @@
 import React from "react";
 import axios from 'axios';
-import Welcome from './Welcome.js';
 
 class FormPlayer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       name: '',
-      playerData: {},
-      sumbited: false
+      player: {}
     };
   }
 
@@ -30,10 +28,6 @@ class FormPlayer extends React.Component {
       name: this.state.name
     }
 
-    this.setState({
-      sumbited: true
-    })
-
     axios
       .post(`http://localhost:9000/player`, player, {
         headers: headers
@@ -44,9 +38,11 @@ class FormPlayer extends React.Component {
           console.log(res.data.response.name)
           this.setState({
             name: res.data.response.name,
-            playerData: res.data,
+            player: res.data,
           })
         }
+        console.log(res.data.response)
+        this.props.action(res.data.response)
       })
       .catch((error) => {
         console.log(error)
@@ -65,8 +61,8 @@ class FormPlayer extends React.Component {
 
           <button type="submit" value="Submit">OK</button>
         </form>
-        <br />
-        <Welcome state={this.state} />
+        {/* <br />
+        <Welcome state={this.state} /> */}
       </div>
     )
   }

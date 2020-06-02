@@ -1,15 +1,25 @@
 import React from 'react';
 import axios from 'axios';
+import CreateRoom from './CreateRoom';
+import AvailableRooms from './AvailableRooms';
 
 class ButtonGet extends React.Component {
     constructor(props) {
         super(props);
-
+        this.state = {
+            player: props.player,
+            room: [],
+            isLoading: true,
+            clicked: false,
+            error: null
+        }
+        console.log("In ButtonGet to get rooms")
+        console.log(props)
     }
 
     getAvaiableRooms = () => {
         const headers = {
-            'Authorization': 'bbb7e1552fc6fac4cd7a1318fd66dfc51ba9f5cb07c5744140bc1d3ba0298d104d54cb48f827dfaa28cf69ad510c7e9b5cd6fb7f91211a0d1ce6cd7cb0f6c18463a4834025a9e893949d7a7a96eaf074ad9486ed4d6f07c81bd0a1445b48024abb260a829aa9d7b737c9'
+            'Authorization': this.props.player.session_token
         }
 
         axios
@@ -17,24 +27,39 @@ class ButtonGet extends React.Component {
                 headers: headers
             })
             .then(res => {
-                if (res.status === 200) {
-                    console.log("Status OK")
-                    console.log(res.data)
-                }
-            })
-            .catch((error) => {
-                console.log(error)
-            })
+                console.log("response")
+                console.log(res)
 
+                this.setState({
+                    room: res.data.status === 200 ? res.data.response : [],
+                    isLoading: false,
+                    clicked: true
+                });
+            })
+            .catch(error => this.setState({ error, isLoading: false }));
+
+        console.log("inButtonGet after call room")
+        console.log(this.state)
     }
 
-
     render() {
+
+        if (!this.state.clicked) {
+            return (
+                <div>
+                    <button onClick={this.getAvaiableRooms}>
+                        Join a game
+                    </button>
+                </div>
+            )
+        }
+
         return (
             <div>
-                <button onClick={this.getAvaiableRooms}>
-                    Join a game
-                </button>
+                {this.state.room.length === 0 ?
+                    <CreateRoom /> :
+                    <AvailableRooms room={this.state.room} />
+                }
             </div>
         )
     }
