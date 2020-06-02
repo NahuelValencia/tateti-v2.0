@@ -57,8 +57,8 @@ class ButtonGet extends React.Component {
         return (
             <div>
                 {this.state.room.length === 0 ?
-                    <CreateRoom /> :
-                    <AvailableRooms room={this.state.room} />
+                    <CreateRoom room={this.state} /> :
+                    <AvailableRooms room={this.state} />
                 }
             </div>
         )
