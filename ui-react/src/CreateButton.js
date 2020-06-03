@@ -34,6 +34,7 @@ class CreateButton extends React.Component {
                         clicked: true
                     })
                 }
+                this.props.action()
             })
             .catch(error => this.setState({ error, isLoading: false }));
 
@@ -42,23 +43,13 @@ class CreateButton extends React.Component {
 
 
     render() {
-
-        if (!this.state.clicked) {
-            return (
-                <td>
-                    <button onClick={this.createRoom}>
-                        Create new game
+        return (
+            <td>
+                <button onClick={this.createRoom}>
+                    Create new game
                 </button>
-                </td >
-            )
-        } else {
-            return (
-                <div>
-                    <p>waiting for an oponent</p>
-                    <p>Timer</p>
-                </div>
-            )
-        }
+            </td >
+        )
     }
 }
 
