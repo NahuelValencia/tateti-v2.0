@@ -6,7 +6,7 @@ class CreateButton extends React.Component {
         super(props)
         console.log("CreateButton")
         console.log(props)
-        this.state = {
+        this.state = { //TODO no hace falta este estado
             room: {},
             clicked: false
         }
@@ -14,11 +14,11 @@ class CreateButton extends React.Component {
 
     createRoom = () => {
         const headers = {
-            'Authorization': this.props.player.session_token
+            'Authorization': this.props.state.player.session_token
         }
 
         const playerId = {
-            playerId: this.props.player.playerId
+            playerId: this.props.state.player.playerId
         }
 
         axios
@@ -33,8 +33,8 @@ class CreateButton extends React.Component {
                         room: res.data.response,
                         clicked: true
                     })
+                    this.props.action(res.data.response, false)
                 }
-                this.props.action()
             })
             .catch(error => this.setState({ error, isLoading: false }));
 

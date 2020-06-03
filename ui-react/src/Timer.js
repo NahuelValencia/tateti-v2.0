@@ -1,13 +1,16 @@
-import React from "react"
+import React from "react";
+import axios from 'axios';
 
 
 export default class Timer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            minutes: 0,
-            seconds: 10
+            minutes: 2,
+            seconds: 30
         };
+        console.log(`in Timer`)
+        console.log(props)
     }
 
     componentDidMount() {
@@ -47,7 +50,23 @@ export default class Timer extends React.Component {
     }
 
     leave = () => {
+        const headers = {
+            'Authorization': this.props.data.player.session_token
+        }
 
+        axios
+            .delete(`http://localhost:9000/room/${this.props.data.room.roomId}`, {
+                headers: headers
+            })
+            .then(res => {
+                if (res.status === 200) {
+                    console.log("Status OK")
+                    console.log(res.data.response)
+
+                    this.props.action([], true)
+                }
+            })
+            .catch(error => this.setState({ error }));
     }
 
     render() {

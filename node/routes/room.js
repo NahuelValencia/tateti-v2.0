@@ -354,14 +354,14 @@ roomRouter.delete('/:roomId', async function(req, res, next) {
     }
 
 
-    var key = `waitingRoom#${req.body.roomId}`
+    var key = `waitingRoom#${req.params.roomId}`
 
     var response = await RedisClient.deleteByID(key)
 
     if (response) {
         res.json({
             status: HttpStatus.OK,
-            response: `Room ${req.body.roomId} deleted`
+            response: `Room ${req.params.roomId} deleted`
         });
     } else {
         res.json({

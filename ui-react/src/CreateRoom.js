@@ -9,14 +9,17 @@ class CreateRoom extends React.Component {
         console.log(props)
         this.state = {
             noRoom: true,
+            player: props.room.player,
+            room: props.room.room
         }
 
         this.handler = this.handler.bind(this);
     }
 
-    handler() {
+    handler(room, isRoom) {
         this.setState({
-            noRoom: false,
+            noRoom: isRoom,
+            room: room
         });
     }
 
@@ -29,7 +32,7 @@ class CreateRoom extends React.Component {
                     <table>
                         <tbody>
                             <tr>
-                                <CreateButton player={this.props.room.player} state={this.state} action={this.handler} />
+                                <CreateButton state={this.state} action={this.handler} />
                             </tr>
                         </tbody>
                     </table>
@@ -40,7 +43,7 @@ class CreateRoom extends React.Component {
         return (
             <div>
                 <p>waiting for an oponent</p>
-                <Timer />
+                <Timer data={this.state} action={this.handler} />
             </div>
         )
     }
