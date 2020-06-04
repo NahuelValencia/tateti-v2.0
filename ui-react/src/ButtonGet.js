@@ -47,6 +47,8 @@ class ButtonGet extends React.Component {
         if (!this.state.clicked) {
             return (
                 <div>
+                    <p>Welcome {this.state.player.name}</p>
+                    <br />
                     <button onClick={this.getAvaiableRooms}>
                         Join a game
                     </button>

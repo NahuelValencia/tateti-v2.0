@@ -42,7 +42,7 @@ class CreateRoom extends React.Component {
 
         return (
             <div>
-                <p>waiting for an oponent</p>
+                <p>Waiting for an oponent</p>
                 <Timer data={this.state} action={this.handler} />
             </div>
         )

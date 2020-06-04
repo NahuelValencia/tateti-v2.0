@@ -2,7 +2,6 @@ import React from 'react';
 import './App.css';
 import FormPlayer from './FormPlayer';
 import Title from './Title';
-import Welcome from './Welcome';
 import ButtonGet from './ButtonGet';
 
 class App extends React.Component {
@@ -31,12 +30,8 @@ class App extends React.Component {
         <br />
         {!this.state.player.playerId ?
           <FormPlayer action={this.handler} /> :
-          <>
-            <Welcome player={this.state.player} />
-            <ButtonGet player={this.state.player} />
-          </>
+          <ButtonGet player={this.state.player} />
         }
-
       </div>
     );
   }
