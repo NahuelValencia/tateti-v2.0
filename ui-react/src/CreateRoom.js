@@ -14,6 +14,7 @@ class CreateRoom extends React.Component {
         }
 
         this.handler = this.handler.bind(this);
+        this.handlerBack = this.handlerBack.bind(this);
     }
 
     handler(room, isRoom) {
@@ -21,6 +22,11 @@ class CreateRoom extends React.Component {
             noRoom: isRoom,
             room: room
         });
+    }
+
+    handlerBack(data) {
+        console.log(`1`)
+        this.props.callback(data)
     }
 
     render() {
@@ -43,7 +49,7 @@ class CreateRoom extends React.Component {
         return (
             <div>
                 <p>Waiting for an oponent</p>
-                <Timer data={this.state} action={this.handler} />
+                <Timer data={this.state} action={this.handler} callback={this.handlerBack} />
             </div>
         )
     }

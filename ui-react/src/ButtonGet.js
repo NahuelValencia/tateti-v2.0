@@ -15,6 +15,14 @@ class ButtonGet extends React.Component {
         }
         console.log("In ButtonGet to get rooms")
         console.log(props)
+
+        this.handler = this.handler.bind(this);
+    }
+
+    //send game to his parent
+    handler(data) {
+        console.log(`2`)
+        this.props.callback(data)
     }
 
     getAvaiableRooms = () => {
@@ -59,8 +67,8 @@ class ButtonGet extends React.Component {
         return (
             <div>
                 {this.state.room.length === 0 ?
-                    <CreateRoom room={this.state} /> :
-                    <AvailableRooms room={this.state} />
+                    <CreateRoom room={this.state} callback={this.handler} /> :
+                    <AvailableRooms room={this.state} callback={this.handler} />
                 }
             </div>
         )

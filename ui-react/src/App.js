@@ -9,11 +9,14 @@ class App extends React.Component {
     super(props)
     this.state = {
       player: {},
+      game: {},
+      isReady: false,
       isLoading: true,
       error: null
     }
 
     this.handler = this.handler.bind(this);
+    this.handlerGame = this.handlerGame.bind(this);
   }
 
   // This method will be sent to the child component
@@ -23,15 +26,33 @@ class App extends React.Component {
     });
   }
 
+  handlerGame(data) {
+    console.log("Game created")
+    this.setState({
+      game: data,
+      isReady: true,
+    })
+  }
+
   render() {
+    if (!this.state.isReady) {
+      return (
+        <div className="">
+          <Title />
+          <br />
+          {!this.state.player.playerId ?
+            <FormPlayer action={this.handler} /> :
+            <ButtonGet player={this.state.player} callback={this.handlerGame} />
+          }
+        </div>
+      );
+    }
+
     return (
       <div className="">
         <Title />
         <br />
-        {!this.state.player.playerId ?
-          <FormPlayer action={this.handler} /> :
-          <ButtonGet player={this.state.player} />
-        }
+
       </div>
     );
   }

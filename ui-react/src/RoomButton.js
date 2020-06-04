@@ -34,6 +34,8 @@ class RoomButton extends React.Component {
                 if (res.status === 200) {
                     console.log("Status OK")
                     console.log(res.data.response)
+
+                    this.props.callback(res.data.response) //send the created game to his parent componente
                 }
             })
             .catch(error => this.setState({ error, isLoading: false }));
@@ -42,7 +44,9 @@ class RoomButton extends React.Component {
     render() {
         return (
             <td>
-                <button onClick={this.joinGame}>Room {this.props.room.roomId} </button>
+                <button onClick={this.joinGame}>
+                    Room {this.props.room.roomId}
+                </button>
             </td >
         )
     }
