@@ -23,7 +23,7 @@ class AvailableRoom extends React.Component {
 
         return (
             <div>
-                <p>{this.props.room.player.name} there are {this.props.room.room.length} rooms available. Join one to have a great time</p>
+                <p>There are {this.props.room.room.length} rooms available. Join one to have a great time</p>
                 <br />
                 <table>
                     <tbody>

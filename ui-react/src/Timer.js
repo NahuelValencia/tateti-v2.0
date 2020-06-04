@@ -65,7 +65,7 @@ export default class Timer extends React.Component {
                     if (res.data.status === 200 && res.data.response.available === "false") { // if the room is no available means that another player has joined
                         console.log(`clear interval`)
                         clearInterval(this.interval)
-                        this.getGame(res.data.response)
+                        this.getGame(res.data.data)
                     }
                 })
                 .catch(error => this.setState({ error, isLoading: false }));
@@ -75,7 +75,8 @@ export default class Timer extends React.Component {
 
     getGame(data) {
         //TODO
-        console.log(`in progress`)
+        console.log(`WIP`)
+        console.log(data)
     }
 
     addMinute = () => {

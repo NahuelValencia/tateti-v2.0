@@ -27,7 +27,7 @@ class CreateRoom extends React.Component {
         if (this.state.noRoom) {
             return (
                 <div>
-                    <p>{this.props.room.player.name} there is no game at this moment. Create one please :)</p>
+                    <p>There is no game at this moment. Create one please :)</p>
                     <br />
                     <table>
                         <tbody>
@@ -36,7 +36,7 @@ class CreateRoom extends React.Component {
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                </div >
             )
         }
 
