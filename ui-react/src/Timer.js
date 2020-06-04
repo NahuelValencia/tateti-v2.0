@@ -40,6 +40,40 @@ export default class Timer extends React.Component {
                 }
             }
         }, 1000)
+        this.checkForGame()
+    }
+
+    checkForGame() {
+        console.log(`Checking if someone joing the room`)
+        console.log(this.props)
+
+        let roomId = this.props.data.room.roomId
+        let authorization = this.props.data.player.session_token
+
+        this.interval = setInterval(() => {
+            const headers = {
+                'Authorization': authorization
+            }
+
+            axios
+                .get(`http://localhost:9000/room/${roomId}`, {
+                    headers: headers
+                })
+                .then(res => {
+                    console.log("Response")
+                    if (res.data.status == 200 && res.data.response.availale == false) { // if the room is no available means that another player has joined
+                        clearInterval(this.interval)
+                        getGame(res.data.response)
+                    }
+                })
+                .catch(error => this.setState({ error, isLoading: false }));
+
+        }, 5000)
+    }
+
+    getGame(data) {
+        //TODO
+        console.log(`in progress`)
     }
 
     addMinute = () => {
