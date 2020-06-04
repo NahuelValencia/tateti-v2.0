@@ -327,4 +327,48 @@ roomRouter.post('/:idRoom/join', async function(req, res, next) {
         });
     }
 });
+
+//DELETE
+roomRouter.delete('/:roomId', async function(req, res, next) {
+    //validate token
+    const header_token = req.header('Authorization'); //ProgAv2020
+    console.log(header_token)
+
+    const cryptr = new Cryptr(process.env.SECRET_KEY);
+
+    try {
+        var authorization = cryptr.decrypt(header_token);
+        console.log(authorization)
+    } catch (e) {
+        return res.json({
+            status: HttpStatus.UNAUTHORIZED,
+            response: message.notAuthorized
+        });
+    }
+
+    if (authorization != process.env.SECRET_KEY) {
+        return res.json({
+            status: HttpStatus.UNAUTHORIZED,
+            response: message.notAuthorized
+        });
+    }
+
+
+    var key = `waitingRoom#${req.params.roomId}`
+
+    var response = await RedisClient.deleteByID(key)
+
+    if (response) {
+        res.json({
+            status: HttpStatus.OK,
+            response: `Room ${req.params.roomId} deleted`
+        });
+    } else {
+        res.json({
+            status: HttpStatus.NOT_FOUND,
+            response: message.notFound
+        });
+    }
+});
+
 module.exports = roomRouter;
