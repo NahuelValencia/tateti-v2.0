@@ -8,11 +8,15 @@ class AvailableRoom extends React.Component {
         console.log(props.room.room)
     }
 
+    handler() {
+
+    }
+
     render() {
 
         let room = this.props.room.room.map((item, index) => {
             return (
-                <RoomButton key={index} data={item.roomId} />
+                <RoomButton key={index} room={item} player={this.props.room.player} action={this.handler} />
             );
 
         })

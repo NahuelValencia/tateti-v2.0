@@ -18,6 +18,7 @@ class ButtonGet extends React.Component {
     }
 
     getAvaiableRooms = () => {
+        console.log(`get available rooms call`)
         const headers = {
             'Authorization': this.props.player.session_token
         }
@@ -35,11 +36,10 @@ class ButtonGet extends React.Component {
                     isLoading: false,
                     clicked: true
                 });
+                console.log(`Really after asynchrounus call`)
+                console.log(this.state)
             })
             .catch(error => this.setState({ error, isLoading: false }));
-
-        console.log("inButtonGet after call room")
-        console.log(this.state)
     }
 
     render() {
