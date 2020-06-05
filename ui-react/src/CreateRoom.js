@@ -5,10 +5,8 @@ import Timer from './Timer';
 class CreateRoom extends React.Component {
     constructor(props) {
         super(props)
-        console.log("CreateRoom")
-        console.log(props)
         this.state = {
-            noRoom: true,
+            noRoom: true,  //true: there are NO room.
             player: props.room.player,
             room: props.room.room
         }
@@ -30,7 +28,7 @@ class CreateRoom extends React.Component {
     }
 
     render() {
-        if (this.state.noRoom) {
+        if (this.state.noRoom) {   //there is no room
             return (
                 <div>
                     <p>There is no game at this moment. Create one please :)</p>
@@ -45,7 +43,7 @@ class CreateRoom extends React.Component {
                 </div >
             )
         }
-
+        //this is a timer after creating a room.
         return (
             <div>
                 <p>Waiting for an oponent</p>

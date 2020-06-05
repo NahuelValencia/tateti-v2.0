@@ -4,8 +4,6 @@ import RoomButton from './RoomButton';
 class AvailableRoom extends React.Component {
     constructor(props) {
         super(props)
-        console.log("AvailableRoom")
-        console.log(props.room.room)
 
         this.handler = this.handler.bind(this);
     }
@@ -17,7 +15,6 @@ class AvailableRoom extends React.Component {
     }
 
     render() {
-
         let room = this.props.room.room.map((item, index) => {
             return (
                 <RoomButton key={index} room={item} player={this.props.room.player} callback={this.handler} />
@@ -38,8 +35,6 @@ class AvailableRoom extends React.Component {
                 </table>
             </div>
         )
-
-
     }
 }
 

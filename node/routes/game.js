@@ -37,6 +37,21 @@ gameRouter.post('/', async function(req, res, next) {
         });
     }
 
+    //SEARCH THE ROOM
+    var room_key = `waitingRoom#${req.body.roomId}`
+    try {
+        var room = await RedisClient.searchById(room_key)
+    } catch (error) {
+        return console.log(`An error has occurred: ${error}`)
+    }
+    //UPDATE ROOM
+    room.gameReady = true
+    try {
+        await RedisClient.update(room_key, room, isPlayer = false, isGame = false, isBoard = false, isRoom = true)
+    } catch (error) {
+        return console.log(`An error has occurred: ${error}`)
+    }
+
     //SEARCH PLAYERS SENT IN BODY, IN REDIS BY ID
     var players = new Array();
     try {

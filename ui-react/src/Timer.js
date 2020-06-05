@@ -1,7 +1,6 @@
 import React from "react";
 import axios from 'axios';
 
-
 export default class Timer extends React.Component {
     constructor(props) {
         super(props);
@@ -9,8 +8,6 @@ export default class Timer extends React.Component {
             minutes: 2,
             seconds: 30
         };
-        console.log(`in Timer`)
-        console.log(props)
     }
 
     componentDidMount() {
@@ -18,7 +15,7 @@ export default class Timer extends React.Component {
     }
 
     componentWillUnmount() {
-        clearInterval(this.timerID);
+        clearInterval(this.interval) //TODO Why this doesn't unmount it?
     }
 
     startRunning = () => {
@@ -39,14 +36,14 @@ export default class Timer extends React.Component {
                     }))
                 }
             }
+            //TODO How can I stop this? Unmount doesnt work??
+            console.log(`${minutes}:${seconds}`)
         }, 1000)
+
         this.checkForGame()
     }
 
     checkForGame() {
-        console.log(`Checking if someone joing the room`)
-        console.log(this.props)
-
         let roomId = this.props.data.room.roomId
         let authorization = this.props.data.player.session_token
 
@@ -60,10 +57,8 @@ export default class Timer extends React.Component {
                     headers: headers
                 })
                 .then(res => {
-                    console.log("Response")
                     console.log(res.data.response)
-                    if (res.data.status === 200 && res.data.response.available === "false") { // if the room is no available means that another player has joined
-                        console.log(`clear interval`)
+                    if (res.data.status === 200 && res.data.response.available === "false" && res.data.response.gameReady === "true") { // if the room is no available means that another player has joined
                         clearInterval(this.interval)
                         this.goBack(res.data.response)
                     }
@@ -74,11 +69,7 @@ export default class Timer extends React.Component {
     }
 
     goBack(data) {
-        //TODO
-        console.log(`WIP`)
-        console.log(data)
         this.props.callback(data)
-
     }
 
     addMinute = () => {
@@ -100,7 +91,6 @@ export default class Timer extends React.Component {
             .then(res => {
                 if (res.status === 200) {
                     console.log("Status OK")
-                    console.log(res.data.response)
 
                     this.props.action([], true)
                 }

@@ -18,10 +18,9 @@ class FormPlayer extends React.Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    console.log('Player: ' + this.state.name);
 
     const headers = {
-      'Authorization': 'ProgAv2020'
+      'Authorization': 'ProgAv2020' //TODO change
     }
 
     const player = {
@@ -41,13 +40,11 @@ class FormPlayer extends React.Component {
             player: res.data,
           })
         }
-        console.log(res.data.response)
         this.props.action(res.data.response)
       })
       .catch((error) => {
         console.log(error)
       })
-    console.log('Name: ' + this.state.name)
   }
 
   render() {
@@ -61,8 +58,6 @@ class FormPlayer extends React.Component {
 
           <button type="submit" value="Submit">OK</button>
         </form>
-        {/* <br />
-        <Welcome state={this.state} /> */}
       </div>
     )
   }

@@ -9,24 +9,20 @@ class ButtonGet extends React.Component {
         this.state = {
             player: props.player,
             room: [],
-            isLoading: true,
             clicked: false,
+            isLoading: true,
             error: null
         }
-        console.log("In ButtonGet to get rooms")
-        console.log(props)
 
         this.handler = this.handler.bind(this);
     }
 
-    //send game to his parent
     handler(data) {
-        console.log(`2`)
         this.props.callback(data)
     }
 
     getAvaiableRooms = () => {
-        console.log(`get available rooms call`)
+
         const headers = {
             'Authorization': this.props.player.session_token
         }
@@ -36,16 +32,11 @@ class ButtonGet extends React.Component {
                 headers: headers
             })
             .then(res => {
-                console.log("response")
-                console.log(res)
-
                 this.setState({
                     room: res.data.status === 200 ? res.data.response : [],
-                    isLoading: false,
-                    clicked: true
+                    clicked: true,
+                    isLoading: false
                 });
-                console.log(`Really after asynchrounus call`)
-                console.log(this.state)
             })
             .catch(error => this.setState({ error, isLoading: false }));
     }
