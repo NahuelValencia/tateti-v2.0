@@ -9,16 +9,20 @@ class ButtonGet extends React.Component {
         this.state = {
             player: props.player,
             room: [],
-            isLoading: true,
             clicked: false,
+            isLoading: true,
             error: null
         }
-        console.log("In ButtonGet to get rooms")
-        console.log(props)
+
+        this.handler = this.handler.bind(this);
+    }
+
+    handler(data) {
+        this.props.callback(data)
     }
 
     getAvaiableRooms = () => {
-        console.log(`get available rooms call`)
+
         const headers = {
             'Authorization': this.props.player.session_token
         }
@@ -28,16 +32,11 @@ class ButtonGet extends React.Component {
                 headers: headers
             })
             .then(res => {
-                console.log("response")
-                console.log(res)
-
                 this.setState({
                     room: res.data.status === 200 ? res.data.response : [],
-                    isLoading: false,
-                    clicked: true
+                    clicked: true,
+                    isLoading: false
                 });
-                console.log(`Really after asynchrounus call`)
-                console.log(this.state)
             })
             .catch(error => this.setState({ error, isLoading: false }));
     }
@@ -47,6 +46,8 @@ class ButtonGet extends React.Component {
         if (!this.state.clicked) {
             return (
                 <div>
+                    <p>Welcome {this.state.player.name}</p>
+                    <br />
                     <button onClick={this.getAvaiableRooms}>
                         Join a game
                     </button>
@@ -57,8 +58,8 @@ class ButtonGet extends React.Component {
         return (
             <div>
                 {this.state.room.length === 0 ?
-                    <CreateRoom room={this.state} /> :
-                    <AvailableRooms room={this.state} />
+                    <CreateRoom room={this.state} callback={this.handler} /> :
+                    <AvailableRooms room={this.state} callback={this.handler} />
                 }
             </div>
         )

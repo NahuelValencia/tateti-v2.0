@@ -4,19 +4,20 @@ import RoomButton from './RoomButton';
 class AvailableRoom extends React.Component {
     constructor(props) {
         super(props)
-        console.log("AvailableRoom")
-        console.log(props.room.room)
+
+        this.handler = this.handler.bind(this);
     }
 
-    handler() {
-
+    //send game to his parent
+    handler(data) {
+        console.log(`1`)
+        this.props.callback(data)
     }
 
     render() {
-
         let room = this.props.room.room.map((item, index) => {
             return (
-                <RoomButton key={index} room={item} player={this.props.room.player} action={this.handler} />
+                <RoomButton key={index} room={item} player={this.props.room.player} callback={this.handler} />
             );
 
         })
@@ -34,8 +35,6 @@ class AvailableRoom extends React.Component {
                 </table>
             </div>
         )
-
-
     }
 }
 

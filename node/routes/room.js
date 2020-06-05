@@ -205,7 +205,8 @@ roomRouter.post('/', async function(req, res, next) {
     roomData.roomId = parseInt(newRoomId);
     roomData.player1 = parseInt(req.body.playerId);
     roomData.player2 = "";
-    roomData.available = true
+    roomData.available = true;
+    roomData.gameReady = false;
 
     try {
         var room_saved = await RedisClient.save(room_key, roomData)
