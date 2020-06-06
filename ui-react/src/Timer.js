@@ -36,8 +36,6 @@ export default class Timer extends React.Component {
                     }))
                 }
             }
-            //TODO How can I stop this? Unmount doesnt work??
-            console.log(`${minutes}:${seconds}`)
         }, 1000)
 
         this.checkForGame()

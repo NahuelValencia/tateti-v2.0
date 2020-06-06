@@ -1,6 +1,7 @@
 import React from 'react';
 import CreateButton from './CreateButton';
 import Timer from './Timer';
+import axios from 'axios';
 
 class CreateRoom extends React.Component {
     constructor(props) {
@@ -24,7 +25,25 @@ class CreateRoom extends React.Component {
 
     handlerBack(data) {
         console.log(`1`)
-        this.props.callback(data)
+        console.log(data)
+        this.getGame(data.gameId)
+    }
+
+    getGame(gameId) {
+        const headers = {
+            'Authorization': this.state.player.session_token
+        }
+
+        axios
+            .get(`http://localhost:9000/game/${gameId}`, {
+                headers: headers
+            })
+            .then(res => {
+                if (res.data.status === 200) {
+                    this.props.callback(res.data.response, false, true)
+                }
+            })
+            .catch(error => this.setState({ error, isLoading: false }));
     }
 
     render() {

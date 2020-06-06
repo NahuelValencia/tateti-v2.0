@@ -11,7 +11,7 @@ class AvailableRoom extends React.Component {
     //send game to his parent
     handler(data) {
         console.log(`1`)
-        this.props.callback(data)
+        this.props.callback(data, true, false)
     }
 
     render() {

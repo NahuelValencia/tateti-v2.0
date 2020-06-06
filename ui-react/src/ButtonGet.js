@@ -14,11 +14,16 @@ class ButtonGet extends React.Component {
             error: null
         }
 
-        this.handler = this.handler.bind(this);
+        this.handlerBack = this.handlerBack.bind(this);
     }
 
-    handler(data) {
-        this.props.callback(data)
+    handlerBack(data, isRoom, isGame) {
+        if (isRoom) {
+            this.props.callback(data)
+        }
+        if (isGame) {
+            this.props.callbackGame(data)
+        }
     }
 
     getAvaiableRooms = () => {
@@ -58,8 +63,8 @@ class ButtonGet extends React.Component {
         return (
             <div>
                 {this.state.room.length === 0 ?
-                    <CreateRoom room={this.state} callback={this.handler} /> :
-                    <AvailableRooms room={this.state} callback={this.handler} />
+                    <CreateRoom room={this.state} callback={this.handlerBack} /> :
+                    <AvailableRooms room={this.state} callback={this.handlerBack} />
                 }
             </div>
         )
