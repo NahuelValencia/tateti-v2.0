@@ -37,20 +37,6 @@ gameRouter.post('/', async function(req, res, next) {
         });
     }
 
-    //SEARCH THE ROOM
-    var room_key = `waitingRoom#${req.body.roomId}`
-    try {
-        var room = await RedisClient.searchById(room_key)
-    } catch (error) {
-        return console.log(`An error has occurred: ${error}`)
-    }
-    //UPDATE ROOM
-    room.gameReady = true
-    try {
-        await RedisClient.update(room_key, room, isPlayer = false, isGame = false, isBoard = false, isRoom = true)
-    } catch (error) {
-        return console.log(`An error has occurred: ${error}`)
-    }
 
     //SEARCH PLAYERS SENT IN BODY, IN REDIS BY ID
     var players = new Array();
@@ -78,6 +64,22 @@ gameRouter.post('/', async function(req, res, next) {
         await RedisClient.saveID(newGameId, isPlayer = false, isGame = true, isBoard = false, isRoom = false);
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
+    }
+
+    //SEARCH THE ROOM
+    var room_key = `waitingRoom#${req.body.roomId}`
+    try {
+        var room = await RedisClient.searchById(room_key)
+    } catch (error) {
+        return console.log(`An error has occurred: ${error}`)
+    }
+    //UPDATE ROOM
+    room.gameReady = true
+    room['gameId'] = newGameId
+    try {
+        await RedisClient.update(room_key, room, isPlayer = false, isGame = false, isBoard = false, isRoom = true)
+    } catch (error) {
+        return console.log(`An error has occurred: ${error}`)
     }
 
     //SAVE THE GAME IN REDIS. Also relate the player with the game
