@@ -46,7 +46,6 @@ class App extends React.Component {
       hasJoined: true,
       gameReady: true
     })
-    console.log(this.state)
   }
 
   render() {

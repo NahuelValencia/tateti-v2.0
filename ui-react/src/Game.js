@@ -12,18 +12,20 @@ class Game extends React.Component {
             status: props.game.status,
             moveQty: props.game.moveQty,
             winner: props.game.winner,
+            board: props.board,
+            currentPlayerTurn: null
         }
     }
 
     componentDidMount() {
-        this.checkForTurn()
+        this.checkForPlayerTurn()
     }
 
     componentWillUnmount() {
         clearInterval(this.interval)
     }
 
-    checkForTurn() {
+    checkForPlayerTurn() {
         let gameId = this.props.game.gameId
         let authorization = this.props.currentPlayer.session_token
 
@@ -38,7 +40,12 @@ class Game extends React.Component {
                 })
                 .then(res => {
                     console.log(res.data.response)
-
+                    if (res.data.status === 200) {
+                        this.setState({
+                            board: res.data.response.board,
+                        })
+                        this.clearInterval(this.interval)
+                    }
                 })
                 .catch(error => this.setState({ error, isLoading: false }));
 
@@ -47,7 +54,36 @@ class Game extends React.Component {
 
 
     handleMove(position) {
-        console.log(`click on ${position}th cell`)
+        let currentPlayerId = this.props.currentPlayer.playerId
+        let gameId = this.props.game.gameId
+        let boardId = this.props.game.boardId
+        let authorization = this.props.currentPlayer.session_token
+
+        const headers = {
+            'Authorization': authorization
+        }
+
+        const body = {
+            playerId: currentPlayerId,
+            position: position,
+            gameId: gameId,
+            boardId: boardId
+        }
+
+        axios
+            .put(`http://localhost:9000/game/move`, body, {
+                headers: headers
+            })
+            .then(res => {
+                console.log("Movement")
+                console.log(res.data.response)
+                if (res.status === 200) {
+                    this.setState({
+                        board: res.data.response.board
+                    })
+                }
+            })
+            .catch(error => this.setState({ error, isLoading: false }));
     }
 
     render() {
@@ -63,7 +99,7 @@ class Game extends React.Component {
                 </div>
                 <div className="game">
                     <div className="game-board">
-                        <Board board={this.props.board} players={this.props.players} onClick={(i) => this.handleMove(i)} />
+                        <Board board={this.state.board} players={this.props.players} onClick={(i) => this.handleMove(i)} />
                     </div>
                 </div>
             </div>
