@@ -27,7 +27,7 @@ function isTateti(game, board, currentPlayer) {
     var points = 0;
     for (var cell in board) {
         console.log(cell + ":" + board[cell]);
-        if (board[cell] == currentPlayer.playerId) {
+        if (board[cell] == currentPlayer.pieceSelected) {
             points = points + Math.pow(2, parseInt(cell));
         }
     }

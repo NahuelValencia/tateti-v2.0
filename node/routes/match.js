@@ -125,7 +125,7 @@ moveRouter.put('/', async function(req, res, next) {
     //check if there is a winner
     if (tateti.isTateti(game, board, currentPlayer)) {
         console.log("isTateti")
-        game.winner = currentPlayer.playerId;
+        game.winner = currentPlayer.name;
         game.status = "Game Over"
     }
 
