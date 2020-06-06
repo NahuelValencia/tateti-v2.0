@@ -77,7 +77,7 @@ class App extends React.Component {
       <div className="">
         <Title />
         <br />
-        <Game game={this.state.game} board={this.state.game.board} players={this.state.game.players} />
+        <Game game={this.state.game} board={this.state.game.board} players={this.state.game.players} currentPlayer={this.state.player} />
       </div>
     );
   }

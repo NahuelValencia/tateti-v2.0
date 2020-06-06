@@ -9,7 +9,7 @@ class Board extends Component {
     }
 
     renderCell(i) {
-        return <Cell value={this.props.board[i]} />
+        return <Cell value={this.props.board[i]} onClick={() => this.props.onClick(i)} />
     }
 
     render() {

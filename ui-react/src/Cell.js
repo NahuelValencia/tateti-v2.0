@@ -4,9 +4,9 @@ function Cell(props) {
     console.log(`in SQUARE`)
     console.log(props)
     return (
-        <button>
+        <button className="square" onClick={() => props.onClick()}>
             {props.value}
-        </button>
+        </ button>
     );
 }
 
