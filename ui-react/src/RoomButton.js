@@ -1,9 +1,9 @@
 import React from 'react';
-import axios from 'axios';
+import { joinRoom } from './service/RoomApi';
 
 class RoomButton extends React.Component {
 
-    joinGame = () => {
+    joinGame = async () => {
         let player = this.props.player
         let room = this.props.room
 
@@ -15,17 +15,14 @@ class RoomButton extends React.Component {
             playerId: player.playerId
         }
 
-        axios
-            .post(`http://localhost:9000/room/${room.roomId}/join`, playerId, {
-                headers: headers
-            })
-            .then(res => {
-                if (res.status === 200) {
-
-                    this.props.callback(res.data.response) //send the created game to his parent componente
-                }
-            })
-            .catch(error => this.setState({ error, isLoading: false }));
+        try {
+            let res = await joinRoom(room.roomId, playerId, headers)
+            if (res.status === 200) {
+                this.props.callback(res.response) //send the created game to his parent componente
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     render() {

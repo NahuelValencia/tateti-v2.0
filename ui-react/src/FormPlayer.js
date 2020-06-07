@@ -1,5 +1,5 @@
 import React from "react";
-import axios from 'axios';
+import { createPlayer } from "./service/PlayerApi";
 
 class FormPlayer extends React.Component {
   constructor(props) {
@@ -16,35 +16,35 @@ class FormPlayer extends React.Component {
     this.setState(newState);
   }
 
-  handleSubmit = event => {
+  handleSubmit = async event => {
     event.preventDefault();
 
     const headers = {
-      'Authorization': 'ProgAv2020' //TODO change
+      'Authorization': 'ProgAv2020'
     }
 
     const player = {
       name: this.state.name
     }
 
-    axios
-      .post(`http://localhost:9000/player`, player, {
-        headers: headers
-      })
-      .then(res => {
-        if (res.status === 200) {
-          console.log("Status OK")
-          console.log(res.data.response.name)
-          this.setState({
-            name: res.data.response.name,
-            player: res.data,
-          })
-        }
-        this.props.action(res.data.response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+    try {
+      let res = await createPlayer(player, headers)
+
+      if (res.status === 200) {
+        console.log("Player Created")
+        console.log(res.response)
+        this.setState({
+          name: res.response.name,
+          player: res.response,
+        })
+      }
+      if (res.status === 400) {
+        alert("A name must be provided")
+      }
+      this.props.action(res.response)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   render() {

@@ -1,9 +1,9 @@
 import React from 'react';
-import axios from 'axios';
+import { createRoom } from './service/RoomApi';
 
 class CreateButton extends React.Component {
 
-    createRoom = () => {
+    createRoom = async () => {
         const headers = {
             'Authorization': this.props.state.player.session_token
         }
@@ -12,20 +12,17 @@ class CreateButton extends React.Component {
             playerId: this.props.state.player.playerId
         }
 
-        axios
-            .post(`http://localhost:9000/room`, playerId, {
-                headers: headers
-            })
-            .then(res => {
-                if (res.status === 200) {
-                    console.log("Status OK")
-
-                    this.props.action(res.data.response, false)
-                }
-            })
-            .catch(error => this.setState({ error, isLoading: false }));
+        try {
+            let res = await createRoom(playerId, headers)
+            if (res.status === 200) {
+                console.log("Room Created")
+                console.log(res.response)
+                this.props.action(res.response, false)
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
-
 
     render() {
         return (

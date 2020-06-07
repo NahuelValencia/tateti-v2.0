@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import Board from './Board';
-import axios from 'axios';
+import { searchGameById, makeMovement } from './service/GameApi'
 
 class Game extends React.Component {
     constructor(props) {
@@ -25,35 +25,35 @@ class Game extends React.Component {
         clearInterval(this.interval)
     }
 
-    checkForPlayerTurn() {
+    checkForPlayerTurn = async () => {
         let gameId = this.props.game.gameId
         let authorization = this.props.currentPlayer.session_token
 
-        this.interval = setInterval(() => {
-            const headers = {
-                'Authorization': authorization
+        const headers = {
+            'Authorization': authorization
+        }
+
+        this.interval = setInterval(async () => {
+
+            try {
+                let res = await searchGameById(gameId, headers)
+                if (res.status === 200) {
+                    this.setState({
+                        board: res.response.board,
+                    })
+
+                }
+                if (res.status === 400) {
+                    clearInterval(this.interval)
+                }
+            } catch (error) {
+                console.log(error)
             }
-
-            axios
-                .get(`http://localhost:9000/game/${gameId}`, {
-                    headers: headers
-                })
-                .then(res => {
-                    console.log(res.data.response)
-                    if (res.data.status === 200) {
-                        this.setState({
-                            board: res.data.response.board,
-                        })
-                        this.clearInterval(this.interval)
-                    }
-                })
-                .catch(error => this.setState({ error, isLoading: false }));
-
         }, 2000)
     }
 
 
-    handleMove(position) {
+    handleMove = async (position) => {
         let currentPlayerId = this.props.currentPlayer.playerId
         let gameId = this.props.game.gameId
         let boardId = this.props.game.boardId
@@ -70,20 +70,21 @@ class Game extends React.Component {
             boardId: boardId
         }
 
-        axios
-            .put(`http://localhost:9000/game/move`, body, {
-                headers: headers
-            })
-            .then(res => {
-                console.log("Movement")
-                console.log(res.data.response)
-                if (res.status === 200) {
-                    this.setState({
-                        board: res.data.response.board
-                    })
-                }
-            })
-            .catch(error => this.setState({ error, isLoading: false }));
+        try {
+            let res = await makeMovement(body, headers)
+            if (res.status === 200) {
+                console.log("Player movement")
+                console.log(res)
+                this.setState({
+                    board: res.response.board
+                })
+            }
+            if (res.status === 400) {
+                return alert("Not your turn")
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     render() {

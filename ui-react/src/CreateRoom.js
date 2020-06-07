@@ -1,7 +1,7 @@
 import React from 'react';
 import CreateButton from './CreateButton';
 import Timer from './Timer';
-import axios from 'axios';
+import { searchGameById } from './service/GameApi'
 
 class CreateRoom extends React.Component {
     constructor(props) {
@@ -29,21 +29,22 @@ class CreateRoom extends React.Component {
         this.getGame(data.gameId)
     }
 
-    getGame(gameId) {
+    getGame = async (gameId) => {
         const headers = {
             'Authorization': this.state.player.session_token
         }
 
-        axios
-            .get(`http://localhost:9000/game/${gameId}`, {
-                headers: headers
-            })
-            .then(res => {
-                if (res.data.status === 200) {
-                    this.props.callback(res.data.response, false, true)
-                }
-            })
-            .catch(error => this.setState({ error, isLoading: false }));
+        try {
+            let res = await searchGameById(gameId, headers)
+            if (res.status === 200) {
+                this.props.callback(res.response, false, true)
+            }
+            if (res.status === 400) {
+                clearInterval(this.interval)
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     render() {
