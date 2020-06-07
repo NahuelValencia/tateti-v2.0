@@ -19,14 +19,13 @@ function isTateti(game, board, currentPlayer) {
     console.log(`Current player`)
     console.log(currentPlayer);
 
-    //antes de 5 movimientos no hay chances de que exista tateti, por eso verifico si hay ganadores a partir del 5 movmiento
+    //antes de 5 movimientos no hay chances de que exista tateti, por eso verifico si hay ganadores a partir del 5to movimiento
     if (game.moveQty < 5) {
         return false;
     }
 
     var points = 0;
     for (var cell in board) {
-        console.log(cell + ":" + board[cell]);
         if (board[cell] == currentPlayer.pieceSelected) {
             points = points + Math.pow(2, parseInt(cell));
         }

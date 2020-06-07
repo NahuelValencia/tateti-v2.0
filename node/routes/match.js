@@ -8,6 +8,7 @@ var tateti = require('../utils/tatetiUtils');
 const Cryptr = require('cryptr');
 
 var RedisClient = require('../database/redis_adapter')
+var redisKeyEnum = require('../database/redis_adapter').redisKeyEnum;
 
 
 //PUT
@@ -38,7 +39,7 @@ moveRouter.put('/', async function(req, res, next) {
 
 
     //SEARCH GAME
-    var game_key = `game#${req.body.gameId}`;
+    var game_key = `${redisKeyEnum.GAME.value}${req.body.gameId}`;
     console.log(`gameId: ${game_key}`);
 
     try {
@@ -49,7 +50,7 @@ moveRouter.put('/', async function(req, res, next) {
     }
 
     //SEARCH THE PLAYER IN REDIS
-    var player_key = `player#${req.body.playerId}`;
+    var player_key = `${redisKeyEnum.PLAYER.value}${req.body.playerId}`;
     console.log(`playerId: ${player_key}`);
 
     try {
@@ -68,7 +69,7 @@ moveRouter.put('/', async function(req, res, next) {
     }
 
     //SEARCH THE BOARD IN REDIS
-    var board_key = `board#${req.body.boardId}`;
+    var board_key = `${redisKeyEnum.BOARD.value}${req.body.boardId}`;
     console.log(`boardId: ${board_key}`);
     //search board
     try {
@@ -136,8 +137,8 @@ moveRouter.put('/', async function(req, res, next) {
 
     //UPDATE TURN'S PLAYER
     try {
-        var player1 = await RedisClient.searchById(`player#${game.player1}`)
-        var player2 = await RedisClient.searchById(`player#${game.player2}`)
+        var player1 = await RedisClient.searchById(`${redisKeyEnum.PLAYER.value}${game.player1}`)
+        var player2 = await RedisClient.searchById(`${redisKeyEnum.PLAYER.value}${game.player2}`)
 
         player1.turn = player1.turn == "true" ? false : true
         player2.turn = player2.turn == "true" ? false : true
@@ -147,22 +148,22 @@ moveRouter.put('/', async function(req, res, next) {
     }
 
     try {
-        await RedisClient.update(`player#${game.player1}`, player1, isPlayer = true, isGame = false, isBoard = false, isRoom = false)
-        await RedisClient.update(`player#${game.player2}`, player2, isPlayer = true, isGame = false, isBoard = false, isRoom = false)
+        await RedisClient.update(`${redisKeyEnum.PLAYER.value}${game.player1}`, player1)
+        await RedisClient.update(`${redisKeyEnum.PLAYER.value}${game.player2}`, player2)
     } catch (err) {
         return console.log(`An error has occurred o aqui: ${err}`)
     }
 
     //UPDATE THE GAME
     try {
-        await RedisClient.update(game_key, game, isPlayer = false, isGame = true, isBoard = false, isRoom = false)
+        await RedisClient.update(game_key, game)
     } catch (err) {
         return console.log(`An error has occurred o aqui: ${err}`)
     }
 
     //UPDATE THE BOARD
     try {
-        var response = await RedisClient.update(board_key, board, isPlayer = false, isGame = false, isBoard = true, isRoom = false)
+        var response = await RedisClient.update(board_key, board)
     } catch (err) {
         return console.log(`An error has occurred o aqui: ${err}`)
     }

@@ -6,6 +6,7 @@ var message = require('../utils/responseConstants');
 const Cryptr = require('cryptr');
 
 var RedisClient = require('../database/redis_adapter');
+var redisKeyEnum = require('../database/redis_adapter').redisKeyEnum
 
 //POSTS
 playerRouter.post('/', async function(req, res, next) {
@@ -29,14 +30,14 @@ playerRouter.post('/', async function(req, res, next) {
 
     //CREATE PLAYER
     try {
-        var id = await RedisClient.getLastKnownID(isPlayer = true, isGame = false, isBoard = false, isRoom = false);
+        var id = await RedisClient.getLastKnownID(redisKeyEnum.PLAYERID.value);
         var newPlayerId = id + 1;
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
 
     try {
-        await RedisClient.saveID(newPlayerId, isPlayer = true, isGame = false, isBoard = false, isRoom = false);
+        await RedisClient.saveID(newPlayerId, redisKeyEnum.PLAYERID.value);
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
@@ -47,7 +48,7 @@ playerRouter.post('/', async function(req, res, next) {
     player_data.playerId = newPlayerId;
     player_data.session_token = private_token;
 
-    var player_key = `player#${newPlayerId}`;
+    var player_key = `${redisKeyEnum.PLAYER.value}${newPlayerId}`;
 
     try {
         var player_saved = await RedisClient.save(player_key, player_data);
@@ -73,7 +74,7 @@ playerRouter.post('/', async function(req, res, next) {
 //POSTS
 playerRouter.get('/', async function(req, res, next) {
     try {
-        var allPlayers = await RedisClient.getAll(`player#*`)
+        var allPlayers = await RedisClient.getAll(`${redisKeyEnum.PLAYER.value}*`)
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }

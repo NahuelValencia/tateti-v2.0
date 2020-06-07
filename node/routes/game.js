@@ -8,6 +8,7 @@ const Cryptr = require('cryptr');
 var parse = require('body-parser')
 
 var RedisClient = require('../database/redis_adapter')
+var redisKeyEnum = require('../database/redis_adapter').redisKeyEnum
 
 
 //POSTS
@@ -42,7 +43,7 @@ gameRouter.post('/', async function(req, res, next) {
     try {
         for (player of req.body.players) {
             console.log(player.id)
-            var key = `player#${player.id}`
+            var key = `${redisKeyEnum.PLAYER.value}${player.id}`
             players.push(await RedisClient.searchById(key))
         }
         console.log(players)
@@ -52,7 +53,7 @@ gameRouter.post('/', async function(req, res, next) {
 
     //CREATE A GAME
     try {
-        var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = true, isBoard = false, isRoom = false);
+        var id = await RedisClient.getLastKnownID(redisKeyEnum.GAMEID.value);
         console.log(`Game previous id: ${id}`)
         var newGameId = id + 1;
     } catch (err) {
@@ -60,13 +61,13 @@ gameRouter.post('/', async function(req, res, next) {
     }
 
     try {
-        await RedisClient.saveID(newGameId, isPlayer = false, isGame = true, isBoard = false, isRoom = false);
+        await RedisClient.saveID(newGameId, redisKeyEnum.GAMEID.value);
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
 
     //SEARCH THE ROOM
-    var room_key = `waitingRoom#${req.body.roomId}`
+    var room_key = `${redisKeyEnum.ROOM.value}${req.body.roomId}`
     try {
         var room = await RedisClient.searchById(room_key)
     } catch (error) {
@@ -76,7 +77,7 @@ gameRouter.post('/', async function(req, res, next) {
     room.gameReady = true
     room['gameId'] = newGameId
     try {
-        await RedisClient.update(room_key, room, isPlayer = false, isGame = false, isBoard = false, isRoom = true)
+        await RedisClient.update(room_key, room)
     } catch (error) {
         return console.log(`An error has occurred: ${error}`)
     }
@@ -93,7 +94,7 @@ gameRouter.post('/', async function(req, res, next) {
 
     //CREAT A BOARD
     try {
-        var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = false, isBoard = true, isRoom = false);
+        var id = await RedisClient.getLastKnownID(redisKeyEnum.BOARDID.value);
         console.log(`Board previous id: ${id}`)
         var newBoardId = id + 1;
     } catch (err) {
@@ -103,7 +104,7 @@ gameRouter.post('/', async function(req, res, next) {
     game_data.boardId = newBoardId;
 
     try {
-        await RedisClient.saveID(newBoardId, isPlayer = false, isGame = false, isBoard = true, isRoom = false);
+        await RedisClient.saveID(newBoardId, redisKeyEnum.BOARDID.value);
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
@@ -115,7 +116,7 @@ gameRouter.post('/', async function(req, res, next) {
     la estructura que vamos a mandar al JSON le ponemos todo
     */
 
-    var game_key = `game#${newGameId}`;
+    var game_key = `${redisKeyEnum.GAME.value}${newGameId}`;
 
     try {
         await RedisClient.save(game_key, game_data)
@@ -136,7 +137,7 @@ gameRouter.post('/', async function(req, res, next) {
         8: "",
     }
 
-    var board_key = `board#${newBoardId}`;
+    var board_key = `${redisKeyEnum.BOARD.value}${newBoardId}`;
 
     try {
         var response = await RedisClient.save(board_key, board)
@@ -194,7 +195,7 @@ gameRouter.get('/:gameId', async function(req, res, next) {
     }
 
     //SEARCH GAME
-    var game_key = `game#${req.params.gameId}`
+    var game_key = `${redisKeyEnum.GAME.value}${req.params.gameId}`
     try {
         var game = await RedisClient.searchById(game_key)
     } catch (error) {
@@ -204,9 +205,9 @@ gameRouter.get('/:gameId', async function(req, res, next) {
     if (game) {
         console.log(game)
         try {
-            var player1 = await RedisClient.searchById(`player#${game.player1}`)
-            var player2 = await RedisClient.searchById(`player#${game.player2}`)
-            var board = await RedisClient.searchById(`board#${game.boardId}`)
+            var player1 = await RedisClient.searchById(`${redisKeyEnum.PLAYER.value}${game.player1}`)
+            var player2 = await RedisClient.searchById(`${redisKeyEnum.PLAYER.value}${game.player2}`)
+            var board = await RedisClient.searchById(`${redisKeyEnum.BOARD.value}${game.boardId}`)
         } catch (error) {
             return console.log(`An error has occurred: ${error}`)
         }
