@@ -6,14 +6,17 @@ First of all, inside node, create a .env file to set the following environment v
   REDIS_PORT=9000
   SECRET_KEY=ProgAv2020
 
+## Database: redis
 
-To run the backend (in the node directory):
+### `docker run --name redis -p 6380:6379 redis` 
+
+## To run the backend (in the node directory):
 
 ### `npm run dev`
 
 Open http://localhost:9000
 
-To run the frontend (in the ui-react directory):
+## To run the frontend (in the ui-react directory):
 
 ### `npm start`
 
