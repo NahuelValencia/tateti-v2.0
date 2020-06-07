@@ -1,5 +1,18 @@
 var clientRedis = require('../database/redis_connection')
 
+const Enum = require('enum')
+
+const redisKeyEnum = new Enum({
+    PLAYER: "player#",
+    ROOM: "waitingRoom#",
+    GAME: "game#",
+    BOARD: "board#",
+    PLAYERID: "playerID",
+    GAMEID: "gameID",
+    BOARDID: "boardID",
+    ROOMID: "roomID"
+})
+
 function getAll(patternKey) {
     return new Promise(resolve => {
         clientRedis.keys(patternKey, (error, result) => {
@@ -27,118 +40,31 @@ function searchById(key) {
     });
 }
 
-function getLastKnownID(isPlayer = false, isGame = false, isBoard = false, isRoom = false) {
-    console.log(`player: ${isPlayer}, game: ${isGame}, board: ${isBoard}, room: ${isRoom}`);
-    if (isPlayer) {
-        return new Promise(resolve => {
-            clientRedis.get('playerID', (err, result) => {
-                console.log(`getLastKnownID ${result}`)
-                if (result) {
-                    resolve(parseInt(result));
-                } else {
-                    resolve(0);
-                }
-            });
+function getLastKnownID(key) {
+    return new Promise(resolve => {
+        clientRedis.get(key, (err, result) => {
+            console.log(`getLastKnownID ${result}`)
+            if (result) {
+                resolve(parseInt(result));
+            } else {
+                resolve(0);
+            }
         });
-    }
-
-    if (isGame) {
-        return new Promise(resolve => {
-            clientRedis.get('gameID', (err, result) => {
-                console.log(`getLastKnownID ${result}`)
-                if (result) {
-                    resolve(parseInt(result));
-                } else {
-                    resolve(0);
-                }
-            });
-        });
-    }
-
-    if (isBoard) {
-        return new Promise(resolve => {
-            clientRedis.get('boardID', (err, result) => {
-                console.log(`getLastKnownID ${result}`)
-                if (result) {
-                    resolve(parseInt(result));
-                } else {
-                    resolve(0);
-                }
-            });
-        });
-    }
-
-    if (isRoom) {
-        return new Promise(resolve => {
-            clientRedis.get('roomID', (err, result) => {
-                console.log(`getLastKnownID ${result}`)
-                if (result) {
-                    resolve(parseInt(result));
-                } else {
-                    resolve(0);
-                }
-            });
-        });
-    }
+    });
 }
 
-function saveID(id, isPlayer = false, isGame = false, isBoard = false, isRoom = false) {
-    console.log(`player: ${isPlayer}, game: ${isGame}, board: ${isBoard}, room: ${isRoom}`)
-    if (isPlayer) {
-        return new Promise(resolve => {
-            clientRedis.set('playerID', id, (err, result) => {
-                if (result) {
-                    console.log(result);
-                    resolve(null);
-                } else {
-                    console.log(err);
-                    resolve(err);
-                }
-            });
+function saveID(id, key) {
+    return new Promise(resolve => {
+        clientRedis.set(key, id, (err, result) => {
+            if (result) {
+                console.log(result);
+                resolve(null);
+            } else {
+                console.log(err);
+                resolve(err);
+            }
         });
-    }
-
-    if (isGame) {
-        return new Promise(resolve => {
-            clientRedis.set('gameID', id, (err, result) => {
-                if (result) {
-                    console.log(result);
-                    resolve(null);
-                } else {
-                    console.log(err);
-                    resolve(err);
-                }
-            });
-        });
-    }
-
-    if (isBoard) {
-        return new Promise(resolve => {
-            clientRedis.set('boardID', id, (err, result) => {
-                if (result) {
-                    console.log(result);
-                    resolve(null);
-                } else {
-                    console.log(err);
-                    resolve(err);
-                }
-            });
-        });
-    }
-
-    if (isRoom) {
-        return new Promise(resolve => {
-            clientRedis.set('roomID', id, (err, result) => {
-                if (result) {
-                    console.log(result);
-                    resolve(null);
-                } else {
-                    console.log(err);
-                    resolve(err);
-                }
-            });
-        });
-    }
+    });
 }
 
 function save(key, data) {
@@ -169,63 +95,18 @@ function resourceExists(key) {
     });
 }
 
-function update(key, data, isPlayer = false, isGame = false, isBoard = false, isRoom = false) {
-    console.log(`client: ${isPlayer}, game: ${isGame}, board: ${isBoard}, room: ${isRoom}`);
-    if (isPlayer) {
-        return new Promise(resolve => {
-            clientRedis.hmset(key, data, (error, result) => {
-                if (result) {
-                    console.log(`Result: ${result}`)
-                    resolve(result)
-                } else {
-                    console.log(`Error: ${error}`)
-                    resolve(error)
-                }
-            });
+function update(key, data) {
+    return new Promise(resolve => {
+        clientRedis.hmset(key, data, (error, result) => {
+            if (result) {
+                console.log(`Result: ${result}`)
+                resolve(result)
+            } else {
+                console.log(`Error: ${error}`)
+                resolve(error)
+            }
         });
-    }
-
-    if (isGame) {
-        return new Promise(resolve => {
-            clientRedis.hmset(key, data, (error, result) => {
-                if (result) {
-                    console.log(`Result: ${result}`)
-                    resolve(result)
-                } else {
-                    console.log(`Error: ${error}`)
-                    resolve(error)
-                }
-            });
-        });
-    }
-
-    if (isBoard) {
-        return new Promise(resolve => {
-            clientRedis.hmset(key, data, (error, result) => {
-                if (result) {
-                    console.log(`Result: ${result}`)
-                    resolve(result)
-                } else {
-                    console.log(`Error: ${error}`)
-                    resolve(error)
-                }
-            });
-        });
-    }
-
-    if (isRoom) {
-        return new Promise(resolve => {
-            clientRedis.hmset(key, data, (error, result) => {
-                if (result) {
-                    console.log(`Result: ${result}`)
-                    resolve(result)
-                } else {
-                    console.log(`Error: ${error}`)
-                    resolve(error)
-                }
-            });
-        });
-    }
+    });
 }
 
 function deleteByID(key) {
@@ -261,5 +142,6 @@ module.exports = {
     resourceExists,
     update,
     deleteByID,
-    deleteAll
+    deleteAll,
+    redisKeyEnum
 }

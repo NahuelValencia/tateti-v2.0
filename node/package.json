@@ -13,6 +13,7 @@
         "cryptr": "^6.0.2",
         "debug": "~2.6.9",
         "dotenv": "^8.2.0",
+        "enum": "^3.0.4",
         "express": "~4.16.1",
         "http-errors": "~1.6.3",
         "http-status-codes": "^1.4.0",

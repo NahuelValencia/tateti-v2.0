@@ -6,6 +6,7 @@ var message = require('../utils/responseConstants');
 const Cryptr = require('cryptr');
 
 var RedisClient = require('../database/redis_adapter');
+var redisKeyEnum = require('../database/redis_adapter').redisKeyEnum;
 
 //GET
 roomRouter.get('/', async function(req, res, next) {
@@ -35,7 +36,7 @@ roomRouter.get('/', async function(req, res, next) {
 
     //get available rooms
     try {
-        var allRooms = await RedisClient.getAll("waitingRoom#*");
+        var allRooms = await RedisClient.getAll(`${redisKeyEnum.ROOM.value}*`);
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
@@ -106,7 +107,7 @@ roomRouter.get('/:idRoom', async function(req, res, next) {
         });
     }
 
-    var room_key = `waitingRoom#${req.params.idRoom}`
+    var room_key = `${redisKeyEnum.ROOM.value}${req.params.idRoom}`
     try {
         var room = await RedisClient.searchById(room_key)
         console.log(`Room ready`)
@@ -156,7 +157,7 @@ roomRouter.post('/', async function(req, res, next) {
     /*
     Check if the player who wants to create the room exists
     */
-    var player_key = `player#${req.body.playerId}`
+    var player_key = `${redisKeyEnum.PLAYER.value}${req.body.playerId}`
     try {
         var player = await RedisClient.searchById(player_key)
     } catch (error) {
@@ -170,7 +171,7 @@ roomRouter.post('/', async function(req, res, next) {
 
         //update player
         try {
-            await RedisClient.update(player_key, player, isPlayer = true, isGame = false, isBoard = false, isRoom = false)
+            await RedisClient.update(player_key, player)
         } catch (error) {
             return console.log(`An error has occurred: ${error}`)
         }
@@ -188,19 +189,19 @@ roomRouter.post('/', async function(req, res, next) {
     var roomData = {};
 
     try {
-        var id = await RedisClient.getLastKnownID(isPlayer = false, isGame = false, isBoard = false, isRoom = true);
+        var id = await RedisClient.getLastKnownID(redisKeyEnum.ROOMID.value);
         var newRoomId = id + 1;
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
 
     try {
-        await RedisClient.saveID(newRoomId, isPlayer = false, isGame = false, isBoard = false, isRoom = true);
+        await RedisClient.saveID(newRoomId, redisKeyEnum.ROOMID.value);
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
 
-    var room_key = `waitingRoom#${newRoomId}`
+    var room_key = `${redisKeyEnum.ROOM.value}${newRoomId}`
 
     roomData.roomId = parseInt(newRoomId);
     roomData.player1 = parseInt(req.body.playerId);
@@ -256,7 +257,7 @@ roomRouter.post('/:idRoom/join', async function(req, res, next) {
     /*
     Check if the player who wants to join the room exists
     */
-    var player_key = `player#${req.body.playerId}`
+    var player_key = `${redisKeyEnum.PLAYER.value}${req.body.playerId}`
     try {
         var player = await RedisClient.searchById(player_key)
     } catch (error) {
@@ -266,7 +267,7 @@ roomRouter.post('/:idRoom/join', async function(req, res, next) {
     if (player) {
         //update player with an O piece
         player.pieceSelected = 'O';
-        await RedisClient.update(player_key, player, isPlayer = true, isGame = false, isBoard = false, isRoom = false)
+        await RedisClient.update(player_key, player)
     } else {
         return res.json({
             status: HttpStatus.NOT_FOUND,
@@ -277,7 +278,7 @@ roomRouter.post('/:idRoom/join', async function(req, res, next) {
     /*
     JOIN TO A WAITING ROOM
     */
-    var room_key = `waitingRoom#${req.params.idRoom}`
+    var room_key = `${redisKeyEnum.ROOM.value}${req.params.idRoom}`
 
     try {
         var room = await RedisClient.searchById(room_key)
@@ -310,7 +311,7 @@ roomRouter.post('/:idRoom/join', async function(req, res, next) {
 
     //update room
     try {
-        var room_updated = await RedisClient.update(room_key, room, isPlayer = false, isGame = false, isBoard = false, isRoom = true);
+        var room_updated = await RedisClient.update(room_key, room);
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
     }
@@ -355,7 +356,7 @@ roomRouter.delete('/:roomId', async function(req, res, next) {
     }
 
 
-    var key = `waitingRoom#${req.params.roomId}`
+    var key = `${redisKeyEnum.ROOM.value}${req.params.roomId}`
 
     var response = await RedisClient.deleteByID(key)
 
