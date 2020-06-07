@@ -5,7 +5,7 @@ export default class Timer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            minutes: 2,
+            minutes: 0,
             seconds: 30
         };
     }
