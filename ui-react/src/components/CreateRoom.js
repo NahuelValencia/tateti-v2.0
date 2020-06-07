@@ -71,7 +71,7 @@ class CreateRoom extends React.Component {
         return (
             <div>
                 <div className='title'>
-                    <h3>Waiting for an oponent</h3>
+                    <h2>Waiting for an oponent</h2>
                 </div>
                 <br />
                 <div className='tittle'>

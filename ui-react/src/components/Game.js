@@ -56,7 +56,7 @@ class Game extends React.Component {
             } else {
                 clearInterval(this.interval)
             }
-        }, 2000)
+        }, 1500)
     }
 
 
