@@ -106,12 +106,12 @@ moveRouter.put('/', async function(req, res, next) {
     move.boardId = req.body.boardId;
     move.position = position;
 
-    console.log("move...") //check if move is necesary
+    console.log("move...") // TODO check if move is necesary
     console.log(move)
 
     currentPlayer = player;
     //change board value
-    board[position] = currentPlayer.playerId
+    board[position] = currentPlayer.pieceSelected
     console.log("Board updated")
     console.log(board)
 
@@ -125,7 +125,7 @@ moveRouter.put('/', async function(req, res, next) {
     //check if there is a winner
     if (tateti.isTateti(game, board, currentPlayer)) {
         console.log("isTateti")
-        game.winner = currentPlayer.playerId;
+        game.winner = currentPlayer.name;
         game.status = "Game Over"
     }
 
@@ -133,15 +133,10 @@ moveRouter.put('/', async function(req, res, next) {
     try {
         var player1 = await RedisClient.searchById(`player#${game.player1}`)
         var player2 = await RedisClient.searchById(`player#${game.player2}`)
-        console.log("-----------")
-        console.log(player1)
-        console.log(player2)
-        console.log(player1.turn)
-        console.log(player2.turn)
+
         player1.turn = player1.turn == "true" ? false : true
         player2.turn = player2.turn == "true" ? false : true
-        console.log(player1.turn)
-        console.log(player2.turn)
+
     } catch (error) {
         return console.log(`An error has occurred o aqui: ${error}`)
     }

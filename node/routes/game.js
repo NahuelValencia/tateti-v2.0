@@ -37,20 +37,6 @@ gameRouter.post('/', async function(req, res, next) {
         });
     }
 
-    //SEARCH THE ROOM
-    var room_key = `waitingRoom#${req.body.roomId}`
-    try {
-        var room = await RedisClient.searchById(room_key)
-    } catch (error) {
-        return console.log(`An error has occurred: ${error}`)
-    }
-    //UPDATE ROOM
-    room.gameReady = true
-    try {
-        await RedisClient.update(room_key, room, isPlayer = false, isGame = false, isBoard = false, isRoom = true)
-    } catch (error) {
-        return console.log(`An error has occurred: ${error}`)
-    }
 
     //SEARCH PLAYERS SENT IN BODY, IN REDIS BY ID
     var players = new Array();
@@ -78,6 +64,22 @@ gameRouter.post('/', async function(req, res, next) {
         await RedisClient.saveID(newGameId, isPlayer = false, isGame = true, isBoard = false, isRoom = false);
     } catch (err) {
         return console.log(`An error has occurred: ${err}`)
+    }
+
+    //SEARCH THE ROOM
+    var room_key = `waitingRoom#${req.body.roomId}`
+    try {
+        var room = await RedisClient.searchById(room_key)
+    } catch (error) {
+        return console.log(`An error has occurred: ${error}`)
+    }
+    //UPDATE ROOM
+    room.gameReady = true
+    room['gameId'] = newGameId
+    try {
+        await RedisClient.update(room_key, room, isPlayer = false, isGame = false, isBoard = false, isRoom = true)
+    } catch (error) {
+        return console.log(`An error has occurred: ${error}`)
     }
 
     //SAVE THE GAME IN REDIS. Also relate the player with the game
@@ -124,15 +126,15 @@ gameRouter.post('/', async function(req, res, next) {
 
     //SAVE THE BOARD
     var board = {
-        0: "null",
-        1: "null",
-        2: "null",
-        3: "null",
-        4: "null",
-        5: "null",
-        6: "null",
-        7: "null",
-        8: "null",
+        0: "",
+        1: "",
+        2: "",
+        3: "",
+        4: "",
+        5: "",
+        6: "",
+        7: "",
+        8: "",
     }
 
     var board_key = `board#${newBoardId}`;

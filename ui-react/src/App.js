@@ -4,6 +4,7 @@ import FormPlayer from './FormPlayer';
 import Title from './Title';
 import ButtonGet from './ButtonGet';
 import ButtonPlay from './ButtonPlay';
+import Game from './Game'
 
 class App extends React.Component {
   constructor(props) {
@@ -34,12 +35,15 @@ class App extends React.Component {
       room: data,
       hasJoined: true,
     })
+    console.log(this.state)
   }
 
   handlerGame(data) {
     console.log("Game created")
+    console.log(this.state)
     this.setState({
       game: data,
+      hasJoined: true,
       gameReady: true
     })
   }
@@ -52,7 +56,7 @@ class App extends React.Component {
           <br />
           {!this.state.player.playerId ?
             <FormPlayer action={this.handler} /> :
-            <ButtonGet player={this.state.player} callback={this.handlerRoom} />
+            <ButtonGet player={this.state.player} callback={this.handlerRoom} callbackGame={this.handlerGame} />
           }
         </div>
       );
@@ -72,7 +76,7 @@ class App extends React.Component {
       <div className="">
         <Title />
         <br />
-        <p>juego creado. TABLERO</p>
+        <Game game={this.state.game} board={this.state.game.board} players={this.state.game.players} currentPlayer={this.state.player} />
       </div>
     );
   }

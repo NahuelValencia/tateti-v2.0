@@ -9,8 +9,7 @@ var RedisClient = require('../database/redis_adapter');
 
 //POSTS
 playerRouter.post('/', async function(req, res, next) {
-    //TODO mover esto a un lugar comun
-    const authorization = req.header('Authorization'); //ProgAv2020
+    const authorization = req.header('Authorization');
 
     if (authorization != process.env.SECRET_KEY) {
         return res.json({
@@ -20,8 +19,6 @@ playerRouter.post('/', async function(req, res, next) {
     }
     const encrypt = new Cryptr(authorization);
     const private_token = encrypt.encrypt(authorization);
-    //    const decryptedString = encrypt.decrypt(private_token); para verificar si el user es valido
-    //    console.log(decryptedString)
 
     if (req.body.name == "" || req.body.name == null) {
         return res.json({

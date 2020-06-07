@@ -1,15 +1,15 @@
 import React from 'react';
-import axios from 'axios';
+import { createGame } from './service/GameApi';
 
 
 class ButtonPlay extends React.Component {
 
-    createGame = () => {
+    createGame = async () => {
         const headers = {
             'Authorization': this.props.data.player.session_token
         }
 
-        const data = {
+        const body = {
             players: [
                 { id: this.props.data.room.player1 },
                 { id: this.props.data.room.player2 }
@@ -17,18 +17,17 @@ class ButtonPlay extends React.Component {
             roomId: this.props.data.room.roomId
         }
 
-        axios
-            .post(`http://localhost:9000/game`, data, {
-                headers: headers
-            })
-            .then(res => {
-                if (res.status === 200) {
-                    this.props.callback(res.data.response)
-                }
-            })
-            .catch((error) => {
-                console.log(error)
-            })
+        try {
+            let res = await createGame(body, headers)
+            console.log(res.response)
+            if (res.status === 200) {
+                console.log("Game created")
+                console.log(res.response)
+                this.props.callback(res.response)
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     render() {

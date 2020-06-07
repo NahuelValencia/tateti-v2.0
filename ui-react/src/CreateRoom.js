@@ -1,6 +1,7 @@
 import React from 'react';
 import CreateButton from './CreateButton';
 import Timer from './Timer';
+import { searchGameById } from './service/GameApi'
 
 class CreateRoom extends React.Component {
     constructor(props) {
@@ -24,7 +25,26 @@ class CreateRoom extends React.Component {
 
     handlerBack(data) {
         console.log(`1`)
-        this.props.callback(data)
+        console.log(data)
+        this.getGame(data.gameId)
+    }
+
+    getGame = async (gameId) => {
+        const headers = {
+            'Authorization': this.state.player.session_token
+        }
+
+        try {
+            let res = await searchGameById(gameId, headers)
+            if (res.status === 200) {
+                this.props.callback(res.response, false, true)
+            }
+            if (res.status === 400) {
+                clearInterval(this.interval)
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     render() {

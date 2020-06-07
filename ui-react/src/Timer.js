@@ -1,5 +1,5 @@
 import React from "react";
-import axios from 'axios';
+import { searhRoomById, deleteRoom } from './service/RoomApi'
 
 export default class Timer extends React.Component {
     constructor(props) {
@@ -18,7 +18,7 @@ export default class Timer extends React.Component {
         clearInterval(this.interval) //TODO Why this doesn't unmount it?
     }
 
-    startRunning = () => {
+    startRunning = async () => {
         this.interval = setInterval(() => {
             const { minutes, seconds } = this.state
             if (seconds > 0) {
@@ -36,35 +36,29 @@ export default class Timer extends React.Component {
                     }))
                 }
             }
-            //TODO How can I stop this? Unmount doesnt work??
-            console.log(`${minutes}:${seconds}`)
         }, 1000)
 
-        this.checkForGame()
+        await this.checkForGame()
     }
 
-    checkForGame() {
+    checkForGame = async () => {
         let roomId = this.props.data.room.roomId
         let authorization = this.props.data.player.session_token
 
-        this.interval = setInterval(() => {
-            const headers = {
-                'Authorization': authorization
+        const headers = {
+            'Authorization': authorization
+        }
+
+        this.interval = setInterval(async () => {
+            try {
+                let res = await searhRoomById(roomId, headers)
+                if (res.status === 200 && res.response.available === "false" && res.response.gameReady === "true") { // if the room is no available means that another player has joined
+                    clearInterval(this.interval)
+                    this.goBack(res.response)
+                }
+            } catch (error) {
+                console.log(error)
             }
-
-            axios
-                .get(`http://localhost:9000/room/${roomId}`, {
-                    headers: headers
-                })
-                .then(res => {
-                    console.log(res.data.response)
-                    if (res.data.status === 200 && res.data.response.available === "false" && res.data.response.gameReady === "true") { // if the room is no available means that another player has joined
-                        clearInterval(this.interval)
-                        this.goBack(res.data.response)
-                    }
-                })
-                .catch(error => this.setState({ error, isLoading: false }));
-
         }, 2000)
     }
 
@@ -79,23 +73,22 @@ export default class Timer extends React.Component {
         this.startRunning()
     }
 
-    leave = () => {
+    leave = async () => {
         const headers = {
             'Authorization': this.props.data.player.session_token
         }
 
-        axios
-            .delete(`http://localhost:9000/room/${this.props.data.room.roomId}`, {
-                headers: headers
-            })
-            .then(res => {
-                if (res.status === 200) {
-                    console.log("Status OK")
+        const roomId = this.props.data.room.roomId
 
-                    this.props.action([], true)
-                }
-            })
-            .catch(error => this.setState({ error }));
+        try {
+            let res = await deleteRoom(roomId, headers)
+            if (res.status === 200) {
+                console.log("Room deleted")
+                this.props.action([], true)
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     render() {

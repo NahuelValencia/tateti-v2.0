@@ -1,7 +1,7 @@
 import React from 'react';
-import axios from 'axios';
 import CreateRoom from './CreateRoom';
 import AvailableRooms from './AvailableRooms';
+import { getAvaiableRooms } from './service/RoomApi';
 
 class ButtonGet extends React.Component {
     constructor(props) {
@@ -14,31 +14,35 @@ class ButtonGet extends React.Component {
             error: null
         }
 
-        this.handler = this.handler.bind(this);
+        this.handlerBack = this.handlerBack.bind(this);
     }
 
-    handler(data) {
-        this.props.callback(data)
+    handlerBack(data, isRoom, isGame) {
+        if (isRoom) {
+            this.props.callback(data)
+        }
+        if (isGame) {
+            this.props.callbackGame(data)
+        }
     }
 
-    getAvaiableRooms = () => {
+    getAvaiableRooms = async () => {
 
         const headers = {
             'Authorization': this.props.player.session_token
         }
 
-        axios
-            .get(`http://localhost:9000/room`, {
-                headers: headers
-            })
-            .then(res => {
-                this.setState({
-                    room: res.data.status === 200 ? res.data.response : [],
-                    clicked: true,
-                    isLoading: false
-                });
-            })
-            .catch(error => this.setState({ error, isLoading: false }));
+        try {
+            let res = await getAvaiableRooms(headers)
+
+            this.setState({
+                room: res.status === 200 ? res.response : [],
+                clicked: true,
+                isLoading: false
+            });
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     render() {
@@ -58,8 +62,8 @@ class ButtonGet extends React.Component {
         return (
             <div>
                 {this.state.room.length === 0 ?
-                    <CreateRoom room={this.state} callback={this.handler} /> :
-                    <AvailableRooms room={this.state} callback={this.handler} />
+                    <CreateRoom room={this.state} callback={this.handlerBack} /> :
+                    <AvailableRooms room={this.state} callback={this.handlerBack} />
                 }
             </div>
         )
