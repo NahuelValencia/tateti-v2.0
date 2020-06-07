@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import FormPlayer from './components/FormPlayer';
 import Title from './components/Title';
-import ButtonGet from './components/ButtonGet';
+import ButtonJoin from './components/ButtonJoin';
 import ButtonPlay from './components/ButtonPlay';
 import Game from './components/Game'
 
@@ -55,7 +55,7 @@ class App extends React.Component {
           <Title />
           {!this.state.player.playerId ?
             <FormPlayer action={this.handler} /> :
-            <ButtonGet player={this.state.player} callback={this.handlerRoom} callbackGame={this.handlerGame} />
+            <ButtonJoin player={this.state.player} callback={this.handlerRoom} callbackGame={this.handlerGame} />
           }
         </div>
       );

@@ -60,13 +60,6 @@ moveRouter.put('/', async function(req, res, next) {
         return console.log(`An error has occurred: ${e}`);
     }
 
-    //validate turn
-    if (player.turn == "false") {
-        return res.json({
-            status: HttpStatus.BAD_REQUEST,
-            response: message.badRequest + ". " + message.notYourTurn
-        });
-    }
 
     //SEARCH THE BOARD IN REDIS
     var board_key = `${redisKeyEnum.BOARD.value}${req.body.boardId}`;
@@ -91,7 +84,15 @@ moveRouter.put('/', async function(req, res, next) {
     if (game.status == "Game Over") {
         return res.json({
             status: HttpStatus.BAD_REQUEST,
-            response: message.gameEnded
+            response: message.badRequest + ". " + message.gameEnded
+        });
+    }
+
+    //validate turn
+    if (player.turn == "false") {
+        return res.json({
+            status: HttpStatus.BAD_REQUEST,
+            response: message.badRequest + ". " + message.notYourTurn
         });
     }
 

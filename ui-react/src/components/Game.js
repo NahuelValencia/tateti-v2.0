@@ -2,6 +2,7 @@ import React from 'react';
 import '../App.css';
 import Board from './Board';
 import { searchGameById, makeMovement } from '../service/GameApi'
+import ButtonPlay from './ButtonPlay';
 
 class Game extends React.Component {
     constructor(props) {
@@ -95,41 +96,41 @@ class Game extends React.Component {
     }
 
     render() {
-        if (this.state.winner === "null") {
-            return (
-                <div>
-                    <div className="player">
-                        <ol>
-                            <li type="circle">
-                                <h3>
-                                    {this.props.players[0].name} plays with '{this.props.players[0].pieceSelected}'
-                            </h3>
-                            </li>
-                            <li type="circle">
-                                <h3>
-                                    {this.props.players[1].name} plays with '{this.props.players[1].pieceSelected}'
-                            </h3>
-                            </li>
-                        </ol>
-                    </div>
-                    <div className="turn">
-                        {this.state.player1.turn === "true" ?
-                            <h2>Turn: {this.state.player1.name}</h2> :
-                            <h2>Turn: {this.state.player2.name}</h2>
-                        }
-                    </div>
-                    <div className="game">
-                        <div className="game-board">
-                            <Board board={this.state.board} onClick={(i) => this.handleMove(i)} />
-                        </div>
-                    </div>
-                </div >
-            )
-        }
         return (
             <div>
-                <h1>{this.state.winner} is the winner</h1>
-            </div>
+                <div className="player">
+                    <ol>
+                        <li type="circle">
+                            <h3>
+                                {this.props.players[0].name} plays with '{this.props.players[0].pieceSelected}'
+                            </h3>
+                        </li>
+                        <li type="circle">
+                            <h3>
+                                {this.props.players[1].name} plays with '{this.props.players[1].pieceSelected}'
+                            </h3>
+                        </li>
+                    </ol>
+                </div>
+                <div>
+                    {this.state.winner === "null" ?
+                        <div className="turn">
+                            {this.state.player1.turn === "true" ?
+                                <h2>Turn: {this.state.player1.name}</h2> :
+                                <h2>Turn: {this.state.player2.name}</h2>
+                            }
+                        </div> :
+                        <div className="turn">
+                            <h1>{this.state.winner} is the winner</h1>
+                        </div>
+                    }
+                </div>
+                <div className="game">
+                    <div className="game-board">
+                        <Board board={this.state.board} onClick={(i) => this.handleMove(i)} />
+                    </div>
+                </div>
+            </div >
         )
     }
 }

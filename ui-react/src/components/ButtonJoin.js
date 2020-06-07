@@ -3,7 +3,7 @@ import CreateRoom from './CreateRoom';
 import AvailableRooms from './AvailableRooms';
 import { getAvaiableRooms } from '../service/RoomApi';
 
-class ButtonGet extends React.Component {
+class ButtonJoin extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -74,4 +74,4 @@ class ButtonGet extends React.Component {
     }
 }
 
-export default ButtonGet;
+export default ButtonJoin;
