@@ -9,11 +9,11 @@ class Game extends React.Component {
         console.log(`in Game`)
         console.log(props)
         this.state = {
-            status: props.game.status,
-            moveQty: props.game.moveQty,
+            gameStatus: props.game.status,
             winner: props.game.winner,
             board: props.board,
-            currentPlayerTurn: null
+            player1: {},
+            player2: {}
         }
     }
 
@@ -34,20 +34,27 @@ class Game extends React.Component {
         }
 
         this.interval = setInterval(async () => {
+            if (this.state.winner !== "Game Over") {
+                try {
+                    let res = await searchGameById(gameId, headers)
+                    if (res.status === 200) {
+                        this.setState({
+                            gameStatus: res.response.status,
+                            winner: res.response.winner,
+                            board: res.response.board,
+                            player1: res.response.players[0],
+                            player2: res.response.players[1]
+                        })
+                    }
+                    if (res.status === 400) {
+                        clearInterval(this.interval)
 
-            try {
-                let res = await searchGameById(gameId, headers)
-                if (res.status === 200) {
-                    this.setState({
-                        board: res.response.board,
-                    })
-
+                    }
+                    console.log("Checking for your turn")
+                    console.log(res)
+                } catch (error) {
+                    console.log(error)
                 }
-                if (res.status === 400) {
-                    clearInterval(this.interval)
-                }
-            } catch (error) {
-                console.log(error)
             }
         }, 2000)
     }
@@ -88,23 +95,36 @@ class Game extends React.Component {
     }
 
     render() {
-        return (
-            <div>
-                <div className="player">
-                    <h4 >
-                        {this.props.players[0].name}  {this.props.players[0].pieceSelected}
-                    </h4>
-                    <h4>
-                        {this.props.players[1].name}  {this.props.players[1].pieceSelected}
-                    </h4>
-                </div>
-                <div className="game">
-                    <div className="game-board">
-                        <Board board={this.state.board} players={this.props.players} onClick={(i) => this.handleMove(i)} />
+        if (this.state.winner === "null") {
+            return (
+                <div>
+                    <div className="player">
+                        <h3 >
+                            {this.props.players[0].name} plays with {this.props.players[0].pieceSelected}
+                        </h3>
+                        <h3>
+                            {this.props.players[1].name} plays with {this.props.players[1].pieceSelected}
+                        </h3>
+                    </div>
+                    <div>
+                        {this.state.player1.turn === "true" ?
+                            <h4>Turn: {this.state.player1.name}</h4> :
+                            <h4>Turn: {this.state.player2.name}</h4>
+                        }
+                    </div>
+                    <div className="game">
+                        <div className="game-board">
+                            <Board board={this.state.board} onClick={(i) => this.handleMove(i)} />
+                        </div>
                     </div>
                 </div>
+            )
+        }
+        return (
+            <div>
+                <h1>{this.state.winner} is the winner</h1>
             </div>
-        );
+        )
     }
 }
 
