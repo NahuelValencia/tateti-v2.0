@@ -1,7 +1,7 @@
 import React from 'react';
-import './App.css';
+import '../App.css';
 import Board from './Board';
-import { searchGameById, makeMovement } from './service/GameApi'
+import { searchGameById, makeMovement } from '../service/GameApi'
 
 class Game extends React.Component {
     constructor(props) {
@@ -34,7 +34,7 @@ class Game extends React.Component {
         }
 
         this.interval = setInterval(async () => {
-            if (this.state.winner !== "Game Over") {
+            if (this.state.gameStatus !== "Game Over") {
                 try {
                     let res = await searchGameById(gameId, headers)
                     if (res.status === 200) {
@@ -50,11 +50,11 @@ class Game extends React.Component {
                         clearInterval(this.interval)
 
                     }
-                    console.log("Checking for your turn")
-                    console.log(res)
                 } catch (error) {
                     console.log(error)
                 }
+            } else {
+                clearInterval(this.interval)
             }
         }, 2000)
     }
@@ -87,7 +87,7 @@ class Game extends React.Component {
                 })
             }
             if (res.status === 400) {
-                return alert("Not your turn")
+                return alert(res.response)
             }
         } catch (error) {
             console.log(error)
@@ -99,17 +99,23 @@ class Game extends React.Component {
             return (
                 <div>
                     <div className="player">
-                        <h3 >
-                            {this.props.players[0].name} plays with {this.props.players[0].pieceSelected}
-                        </h3>
-                        <h3>
-                            {this.props.players[1].name} plays with {this.props.players[1].pieceSelected}
-                        </h3>
+                        <ol>
+                            <li type="circle">
+                                <h3>
+                                    {this.props.players[0].name} plays with '{this.props.players[0].pieceSelected}'
+                            </h3>
+                            </li>
+                            <li type="circle">
+                                <h3>
+                                    {this.props.players[1].name} plays with '{this.props.players[1].pieceSelected}'
+                            </h3>
+                            </li>
+                        </ol>
                     </div>
-                    <div>
+                    <div className="turn">
                         {this.state.player1.turn === "true" ?
-                            <h4>Turn: {this.state.player1.name}</h4> :
-                            <h4>Turn: {this.state.player2.name}</h4>
+                            <h2>Turn: {this.state.player1.name}</h2> :
+                            <h2>Turn: {this.state.player2.name}</h2>
                         }
                     </div>
                     <div className="game">
@@ -117,7 +123,7 @@ class Game extends React.Component {
                             <Board board={this.state.board} onClick={(i) => this.handleMove(i)} />
                         </div>
                     </div>
-                </div>
+                </div >
             )
         }
         return (

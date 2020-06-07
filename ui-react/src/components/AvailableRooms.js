@@ -24,15 +24,19 @@ class AvailableRoom extends React.Component {
 
         return (
             <div>
-                <p>There are {this.props.room.room.length} rooms available. Join one to have a great time</p>
-                <br />
-                <table>
-                    <tbody>
-                        <tr>
-                            {room}
-                        </tr>
-                    </tbody>
-                </table>
+                <div className='title'>
+                    <h3>There are {this.props.room.room.length} rooms available. Join one to have a great time</h3>
+                    <br />
+                </div>
+                <div className='title'>
+                    <table>
+                        <tbody>
+                            <tr>
+                                {room}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         )
     }

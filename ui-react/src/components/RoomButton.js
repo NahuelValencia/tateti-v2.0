@@ -1,5 +1,5 @@
 import React from 'react';
-import { joinRoom } from './service/RoomApi';
+import { joinRoom } from '../service/RoomApi';
 
 class RoomButton extends React.Component {
 

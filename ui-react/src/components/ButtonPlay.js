@@ -1,5 +1,5 @@
 import React from 'react';
-import { createGame } from './service/GameApi';
+import { createGame } from '../service/GameApi';
 
 
 class ButtonPlay extends React.Component {
@@ -32,10 +32,10 @@ class ButtonPlay extends React.Component {
 
     render() {
         return (
-            <div>
-                <button onClick={this.createGame}>
+            <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
+                <button className='buttonPlay' onClick={this.createGame}>
                     PLAY
-                    </button>
+                </button>
             </div>
         )
     }

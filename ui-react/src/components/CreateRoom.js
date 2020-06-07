@@ -1,7 +1,7 @@
 import React from 'react';
 import CreateButton from './CreateButton';
 import Timer from './Timer';
-import { searchGameById } from './service/GameApi'
+import { searchGameById } from '../service/GameApi'
 
 class CreateRoom extends React.Component {
     constructor(props) {
@@ -51,23 +51,32 @@ class CreateRoom extends React.Component {
         if (this.state.noRoom) {   //there is no room
             return (
                 <div>
-                    <p>There is no game at this moment. Create one please :)</p>
+                    <div className='title'>
+                        <h3>There is no game at this moment. Create one please :)</h3>
+                    </div>
                     <br />
-                    <table>
-                        <tbody>
-                            <tr>
-                                <CreateButton state={this.state} action={this.handler} />
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div className='title'>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <CreateButton state={this.state} action={this.handler} />
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div >
             )
         }
         //this is a timer after creating a room.
         return (
             <div>
-                <p>Waiting for an oponent</p>
-                <Timer data={this.state} action={this.handler} callback={this.handlerBack} />
+                <div className='title'>
+                    <h3>Waiting for an oponent</h3>
+                </div>
+                <br />
+                <div className='tittle'>
+                    <Timer data={this.state} action={this.handler} callback={this.handlerBack} />
+                </div>
             </div>
         )
     }

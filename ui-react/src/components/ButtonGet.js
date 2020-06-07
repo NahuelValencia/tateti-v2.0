@@ -1,7 +1,7 @@
 import React from 'react';
 import CreateRoom from './CreateRoom';
 import AvailableRooms from './AvailableRooms';
-import { getAvaiableRooms } from './service/RoomApi';
+import { getAvaiableRooms } from '../service/RoomApi';
 
 class ButtonGet extends React.Component {
     constructor(props) {
@@ -50,11 +50,15 @@ class ButtonGet extends React.Component {
         if (!this.state.clicked) {
             return (
                 <div>
-                    <p>Welcome {this.state.player.name}</p>
-                    <br />
-                    <button onClick={this.getAvaiableRooms}>
-                        Join a game
-                    </button>
+                    <div className='title'>
+                        <h1>Welcome {this.state.player.name}</h1>
+                        <br />
+                    </div>
+                    <div className='title'>
+                        <button onClick={this.getAvaiableRooms}>
+                            Join a room
+                        </button>
+                    </div>
                 </div>
             )
         }

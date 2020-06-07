@@ -1,10 +1,10 @@
 import React from 'react';
 import './App.css';
-import FormPlayer from './FormPlayer';
-import Title from './Title';
-import ButtonGet from './ButtonGet';
-import ButtonPlay from './ButtonPlay';
-import Game from './Game'
+import FormPlayer from './components/FormPlayer';
+import Title from './components/Title';
+import ButtonGet from './components/ButtonGet';
+import ButtonPlay from './components/ButtonPlay';
+import Game from './components/Game'
 
 class App extends React.Component {
   constructor(props) {
@@ -53,7 +53,6 @@ class App extends React.Component {
       return (
         <div className="">
           <Title />
-          <br />
           {!this.state.player.playerId ?
             <FormPlayer action={this.handler} /> :
             <ButtonGet player={this.state.player} callback={this.handlerRoom} callbackGame={this.handlerGame} />
