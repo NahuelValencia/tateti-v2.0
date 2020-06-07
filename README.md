@@ -1,6 +1,12 @@
 # Tateti-v2.0
 Game TaTeTi develop with React in the FE and Expressjs/nodejs in the BE
 
+First of all, inside node, create a .env file to set the following environment variables:
+  REDIS_HOST=localhost
+  REDIS_PORT=9000
+  SECRET_KEY=ProgAv2020
+
+
 To run the backend (in the node directory):
 
 ### `npm run dev`
