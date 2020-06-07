@@ -6,6 +6,7 @@ const cantCreate = "Can't create the resource";
 const cantUpdate = "Can't update the resource";
 const notYourTurn = "Not your turn";
 const busyRoom = "Busy room";
+const cellBusy = "Cell already used";
 const noName = "No Name";
 const gameEnded = "Game Over";
 
@@ -18,6 +19,7 @@ module.exports = {
     cantUpdate,
     notYourTurn,
     busyRoom,
+    cellBusy,
     noName,
     gameEnded,
 };

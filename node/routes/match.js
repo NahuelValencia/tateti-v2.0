@@ -18,7 +18,7 @@ moveRouter.put('/', async function(req, res, next) {
     console.log(header_token)
 
     const cryptr = new Cryptr(process.env.SECRET_KEY);
-    //const private_token = encrypt.encrypt(authorization);
+
     try {
         var authorization = cryptr.decrypt(header_token);
         console.log(authorization)
@@ -106,12 +106,17 @@ moveRouter.put('/', async function(req, res, next) {
     move.boardId = req.body.boardId;
     move.position = position;
 
-    console.log("move...") // TODO check if move is necesary
-    console.log(move)
-
     currentPlayer = player;
-    //change board value
-    board[position] = currentPlayer.pieceSelected
+    //check if the position is already used and change board value
+    if (board[position] === "") {
+        board[position] = currentPlayer.pieceSelected
+    } else {
+        return res.json({
+            status: HttpStatus.BAD_REQUEST,
+            response: message.cellBusy
+        });
+    }
+
     console.log("Board updated")
     console.log(board)
 

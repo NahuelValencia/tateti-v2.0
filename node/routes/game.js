@@ -3,7 +3,6 @@ var gameRouter = express.Router();
 var HttpStatus = require('http-status-codes');
 
 var message = require('../utils/responseConstants');
-var token = require('../utils/tokenGenerator');
 const Cryptr = require('cryptr');
 
 var parse = require('body-parser')

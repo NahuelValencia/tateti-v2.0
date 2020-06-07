@@ -1,5 +1,5 @@
 import React from "react";
-import { createPlayer } from "./service/PlayerApi";
+import { createPlayer } from "../service/PlayerApi";
 
 class FormPlayer extends React.Component {
   constructor(props) {
@@ -49,16 +49,16 @@ class FormPlayer extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
         <form onSubmit={this.handleSubmit}>
           <label>
-            Player Name:
-            <input id="name" type="text" value={this.state.name} onChange={this.handleChange} />
+            <h1>Player Name:</h1>
           </label>
+          <input id="name" type="text" value={this.state.name} onChange={this.handleChange} />
 
           <button type="submit" value="Submit">OK</button>
         </form>
-      </div>
+      </div >
     )
   }
 }

@@ -11,7 +11,7 @@ var RedisClient = require('../database/redis_adapter');
 roomRouter.get('/', async function(req, res, next) {
 
     //validate token
-    const header_token = req.header('Authorization'); //ProgAv2020
+    const header_token = req.header('Authorization');
     console.log(header_token)
 
     const cryptr = new Cryptr(process.env.SECRET_KEY);

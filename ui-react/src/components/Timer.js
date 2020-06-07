@@ -1,5 +1,5 @@
 import React from "react";
-import { searhRoomById, deleteRoom } from './service/RoomApi'
+import { searhRoomById, deleteRoom } from '../service/RoomApi'
 
 export default class Timer extends React.Component {
     constructor(props) {
@@ -54,6 +54,10 @@ export default class Timer extends React.Component {
                 let res = await searhRoomById(roomId, headers)
                 if (res.status === 200 && res.response.available === "false" && res.response.gameReady === "true") { // if the room is no available means that another player has joined
                     clearInterval(this.interval)
+                    this.setState({
+                        minutes: 0,
+                        seconds: 0
+                    })
                     this.goBack(res.response)
                 }
             } catch (error) {
@@ -95,14 +99,14 @@ export default class Timer extends React.Component {
         const { minutes, seconds } = this.state
         if (minutes > 0 || seconds > 0) {
             return (
-                <div>
-                    <p>Time Remaining: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}</p>
+                <div className='title'>
+                    <h3>Time Remaining: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}</h3>
                 </div>
             );
         }
         //leave or still waiting
         return (
-            <div>
+            <div className='title'>
                 <td>
                     <button onClick={this.addMinute}>+1 mins</button>
                 </td>
